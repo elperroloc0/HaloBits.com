@@ -1,0 +1,97 @@
+---
+// Shipped.astro — the light "in the wild" strip. Products live on their own
+// sites, so these cards just link OUT (target/rel set for external links).
+import Section from '../Section.astro';
+import { content } from '../../i18n/content';
+import type { Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = content[lang].shipped;
+---
+
+<Section tone="bg">
+  <div class="s-head">
+    <span class="tag">{c.kicker}</span>
+    <h2>{c.title}</h2>
+    <p class="lead">{c.lead}</p>
+  </div>
+  <div class="ship-grid">
+    {
+      c.items.map((item) => {
+        // mailto: links stay in-tab; external product sites open in a new tab.
+        const external = item.href.startsWith('http');
+        return (
+          <a
+            href={item.href}
+            class="paper ship"
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noopener noreferrer' : undefined}
+          >
+            <span class="tag tag-status">{item.status}</span>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+            <span class="ship-cta">{item.cta}</span>
+          </a>
+        );
+      })
+    }
+  </div>
+</Section>
+
+<style>
+  .s-head {
+    max-width: 640px;
+    margin-bottom: 44px;
+  }
+  .s-head .tag {
+    margin-bottom: 18px;
+  }
+  .s-head h2 {
+    margin-bottom: 16px;
+  }
+  .ship-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .ship {
+    display: block;
+    padding: 30px;
+    color: var(--ink);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .ship:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+  }
+  .ship .tag-status {
+    margin-bottom: 16px;
+    color: #1a7a4f;
+    background: rgba(34, 160, 107, 0.1);
+    border-color: rgba(34, 160, 107, 0.2);
+  }
+  .ship h3 {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+  .ship p {
+    color: var(--muted);
+    margin-bottom: 16px;
+    max-width: 44ch;
+  }
+  .ship-cta {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--accent);
+  }
+  @media (max-width: 720px) {
+    .ship-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

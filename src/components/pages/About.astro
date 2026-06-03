@@ -1,0 +1,95 @@
+---
+// pages/About.astro — the studio story, values, and how-we-work (reusing the
+// shared HowWePartner + CTA sections).
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import HowWePartner from '../sections/HowWePartner.astro';
+import CTA from '../sections/CTA.astro';
+import { content } from '../../i18n/content';
+import type { Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = content[lang].about;
+const meta = content[lang].meta.about;
+---
+
+<Base lang={lang} title={meta.title} description={meta.description}>
+  <Section tone="bg">
+    <div class="s-head">
+      <span class="tag">{c.kicker}</span>
+      <h1>{c.title}</h1>
+    </div>
+    <div class="prose">
+      {c.paragraphs.map((p) => <p>{p}</p>)}
+      <p class="signoff">{c.signoff}</p>
+    </div>
+  </Section>
+
+  <Section tone="surface">
+    <h2 class="values-title">{c.valuesTitle}</h2>
+    <div class="values">
+      {
+        c.values.map((v) => (
+          <div class="value">
+            <h3>{v.title}</h3>
+            <p>{v.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <HowWePartner lang={lang} />
+  <CTA lang={lang} />
+</Base>
+
+<style>
+  .s-head {
+    margin-bottom: 32px;
+  }
+  .s-head .tag {
+    margin-bottom: 18px;
+  }
+  .s-head h1 {
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    max-width: 18ch;
+  }
+  .prose {
+    max-width: var(--maxw-prose);
+  }
+  .prose p {
+    color: var(--ink);
+    margin-bottom: 18px;
+    font-size: 17px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .prose .signoff {
+    color: var(--muted);
+    margin-top: 28px;
+  }
+  .values-title {
+    margin-bottom: 36px;
+  }
+  .values {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+  .value h3 {
+    margin-bottom: 8px;
+  }
+  .value p {
+    color: var(--muted);
+    max-width: 46ch;
+  }
+  @media (max-width: 720px) {
+    .values {
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+  }
+</style>

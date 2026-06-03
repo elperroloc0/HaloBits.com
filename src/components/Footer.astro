@@ -1,0 +1,131 @@
+---
+// Footer.astro — localized site footer. Year is computed at build time.
+import { localizePath, useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<!-- Footer matches the dark design (#080807) — a soft blue ambient blob
+     sits above the content for depth, same technique as the rest of the page. -->
+<footer class="foot">
+  <div class="container foot-inner">
+    <div class="foot-brand">
+      <span class="brand-mark">✦</span>
+      <span class="brand-name">HaloBits</span>
+      <span class="tagline">{t.footer.tagline}</span>
+    </div>
+    <div class="foot-links">
+      <a href={localizePath('/what-we-build/', lang)}>{t.nav.whatWeBuild}</a>
+      <a href={localizePath('/about/', lang)}>{t.nav.about}</a>
+      <a href={localizePath('/contact/', lang)}>{t.nav.contact}</a>
+    </div>
+    <div class="foot-copy">© {year} HaloBits · {t.footer.location}</div>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    margin-top: 0;
+    /* Many stops = smooth ease-in curve (CSS can't do easing natively).
+       Lots of steps at the top where the blue-to-dark change is most visible.
+       Extra padding-top gives the gradient room to breathe before the content. */
+    background: linear-gradient(
+      to bottom,
+      #1f3fc3  0%,
+      #1d3bba  6%,
+      #1a34a8 12%,
+      #162a8a 20%,
+      #121f68 29%,
+      #0e1648 39%,
+      #0a0f2e 50%,
+      #080a1a 62%,
+      #080807 76%,
+      #080807 100%
+    );
+    padding: 120px clamp(1.5rem, 5vw, 2.5rem) 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Subtle ambient blue blob at the top of the footer */
+  .foot::before {
+    content: '';
+    position: absolute;
+    width: 500px;
+    height: 300px;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -80px;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / 0.12), transparent 70%);
+    filter: blur(70px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .foot-inner {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 24px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(240, 235, 229, 0.07);
+  }
+  .foot-brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .brand-mark {
+    color: var(--pw); /* blue-purple from the design, matches brand */
+    font-size: 18px;
+  }
+  .brand-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.03em;
+    color: #f0ebe5; /* light on dark */
+  }
+  .tagline {
+    font-size: 13px;
+    font-style: italic;
+    color: rgba(240, 235, 229, 0.28);
+    margin-left: 10px;
+  }
+  .foot-links {
+    display: flex;
+    gap: 22px;
+  }
+  .foot-links a {
+    font-size: 14px;
+    color: rgba(240, 235, 229, 0.50);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .foot-links a:hover {
+    color: #f0ebe5;
+  }
+  .foot-copy {
+    font-size: 12px;
+    color: rgba(240, 235, 229, 0.28);
+    font-family: 'Geist Mono', 'Geist', monospace;
+    position: relative;
+    z-index: 1;
+    padding-top: 20px;
+  }
+  @media (max-width: 720px) {
+    .foot-inner {
+      grid-template-columns: 1fr;
+    }
+    .tagline {
+      margin-left: 0;
+      flex-basis: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,150 @@
+---
+// UiMockup.astro — decorative CSS-only "studio process" card.
+// Brand-level: evokes partnership / building together, no product-specific UI.
+// aria-hidden so screen readers skip the decoration.
+---
+
+<div class="mock" aria-hidden="true">
+  <div class="mock-bar">
+    <span class="dot d1"></span><span class="dot"></span><span class="dot"></span>
+    <span class="mock-title">HaloBits Studio</span>
+  </div>
+
+  <div class="mock-body">
+    <!-- Vertical process checklist. Each row is its own block-flex row. -->
+    <div class="checklist">
+      <div class="check-row done">
+        <span class="check-icon">✓</span>
+        <span class="check-name">Discovery</span>
+        <span class="badge green">Done</span>
+      </div>
+      <div class="check-row active">
+        <span class="check-icon">●</span>
+        <span class="check-name">Building</span>
+        <span class="badge blue">Active</span>
+      </div>
+      <div class="check-row dim">
+        <span class="check-icon">○</span>
+        <span class="check-name">Running together</span>
+        <span class="badge">Next</span>
+      </div>
+    </div>
+
+    <!-- Progress bars: abstract, brand colors -->
+    <div class="bars">
+      <div class="bar-row">
+        <div class="bar-fill" style="width:78%; background:var(--accent)"></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-fill" style="width:91%; background:#22a06b"></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-fill" style="width:52%; background:var(--accent-light)"></div>
+      </div>
+    </div>
+
+    <div class="foot-row">
+      <span class="hm">✦</span>
+      <span class="ht">Partner, not vendor</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .mock {
+    background: rgba(255, 252, 248, 0.93);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  /* Chrome bar */
+  .mock-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--warm-line);
+    background: rgba(0, 0, 0, 0.015);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--warm-line-2); }
+  .d1 { background: rgba(31, 63, 195, 0.45); }
+  .mock-title { margin-left: 8px; font-size: 11px; letter-spacing: 0.03em; color: var(--muted-soft); }
+
+  .mock-body { padding: 18px 18px 16px; }
+
+  /* Checklist: plain block parent, each row is its own flex row */
+  .checklist { margin-bottom: 14px; }
+
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--warm-line);
+  }
+  .check-row:last-child { border-bottom: none; }
+
+  .check-icon {
+    font-size: 12px;
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+    color: var(--muted-soft);
+  }
+  .check-row.done .check-icon  { color: #22a06b; }
+  .check-row.active .check-icon { color: var(--accent); }
+
+  .check-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    flex: 1;
+  }
+  .check-row.dim .check-name { color: var(--muted); }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: var(--r-pill);
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .badge.green { background: rgba(34,160,107,.12); color: #1a7a4f; }
+  .badge.blue  { background: rgba(31,63,195,.1);  color: var(--accent-deep);
+                 border: 1px solid rgba(31,63,195,.15); }
+
+  /* Progress bars */
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 14px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--warm-line);
+  }
+  .bar-row {
+    height: 6px;
+    background: rgba(0,0,0,0.07);
+    border-radius: var(--r-pill);
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: var(--r-pill);
+    opacity: 0.75;
+  }
+
+  /* Footer */
+  .foot-row { display: flex; align-items: center; gap: 6px; }
+  .hm { color: var(--accent); font-size: 13px; }
+  .ht { font-size: 11px; font-weight: 500; color: var(--muted); }
+</style>

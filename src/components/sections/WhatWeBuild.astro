@@ -1,0 +1,97 @@
+---
+// WhatWeBuild.astro — slightly darker surface with blue + orange blobs.
+import { content } from '../../i18n/content';
+import type { Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const c = content[lang].whatWeBuild;
+---
+
+
+
+<style>
+  .wb-section { overflow: hidden; }
+
+  .wb-section::before,
+  .wb-section::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 140px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wb-section::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(12,11,10,0.70), transparent);
+  }
+  .wb-section::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(12,11,10,0.70), transparent);
+  }
+
+  .wb1 {
+    width: 640px; height: 640px;
+    right: -120px; top: -80px;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / .30), transparent 70%);
+    filter: blur(70px); z-index: 0;
+  }
+  .wb2 {
+    width: 500px; height: 500px;
+    left: -80px; bottom: -40px;
+    background: radial-gradient(circle, oklch(0.62 0.13 42 / .26), transparent 70%);
+    filter: blur(80px); z-index: 0;
+  }
+  .wb3 {
+    width: 440px; height: 440px;
+    left: 35%; top: 30%;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / .12), transparent 70%);
+    filter: blur(90px); z-index: 0;
+  }
+
+  .s-head {
+    max-width: 680px;
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  /* 2×2 grid with hairline separators — from the design */
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .fcard {
+    padding: 34px 30px;
+    background: rgba(17, 17, 16, 0.60);
+    backdrop-filter: blur(14px);
+  }
+  .fnum {
+    font-family: 'Geist Mono', 'Geist', monospace;
+    font-size: 11px; font-weight: 500;
+    color: var(--muted-2);
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+  }
+  .ftitle {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--fg);
+  }
+  .fbody { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+  .feat-coda {
+    font-size: 14px; color: var(--muted-2);
+    font-style: italic;
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  @media (max-width: 720px) {
+    .feat-grid { grid-template-columns: 1fr; }
+  }
+</style>

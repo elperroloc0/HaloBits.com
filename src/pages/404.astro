@@ -1,0 +1,51 @@
+---
+// src/pages/404.astro — the reserved not-found page (Astro → 404.html, served by
+// Vercel for any unknown URL). A 404 is a single file, so it can't be per-locale
+// by route; we render it in English (the default) but reuse the same layout and
+// design system so it still feels like the site.
+import Base from '../layouts/Base.astro';
+import { content } from '../i18n/content';
+import { localizePath } from '../i18n/utils';
+
+const lang = 'en';
+const c = content[lang].notFound;
+const meta = content[lang].meta.notFound;
+---
+
+<Base lang={lang} title={meta.title} description={meta.description}>
+  <section class="notfound">
+    <div class="container">
+      <span class="tag">404</span>
+      <h1>{c.title}</h1>
+      <p class="lead">{c.lead}</p>
+      <div class="nf-cta">
+        <a href={localizePath('/', lang)} class="btn btn-primary">{c.home}</a>
+        <a href={localizePath('/what-we-build/', lang)} class="btn btn-ghost">{c.build}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    padding-block: clamp(96px, 14vw, 160px);
+    text-align: center;
+  }
+  .notfound .tag {
+    margin-bottom: 18px;
+  }
+  .notfound h1 {
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    margin-bottom: 18px;
+  }
+  .notfound .lead {
+    max-width: 44ch;
+    margin: 0 auto 28px;
+  }
+  .nf-cta {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>

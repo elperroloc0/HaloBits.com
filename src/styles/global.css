@@ -1,0 +1,252 @@
+/* =============================================================================
+   global.css — dark-theme design system.
+   ============================================================================ */
+
+:root {
+  /* --- Dark palette --- */
+  --bg:      #0c0b0a;
+  --surface: #111110;
+  --fg:      #f0ebe5;
+
+  /* Brand */
+  --accent:       #1f3fc3;
+  --accent-deep:  #172fa8;
+  --accent-light: #5973d8;
+
+  /* Text */
+  --ink:       #f0ebe5;
+  --muted:     rgba(240, 235, 229, 0.50);
+  --muted-2:   rgba(240, 235, 229, 0.28);
+
+  /* Lines / borders */
+  --line:   rgba(240, 235, 229, 0.07);
+  --line-2: rgba(240, 235, 229, 0.13);
+
+  /* Shadows (less useful on dark, kept for components) */
+  --shadow-soft: 0 6px 28px -10px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 14px 50px -16px rgba(0, 0, 0, 0.55);
+
+  /* Radii */
+  --r:    18px;
+  --pill: 99px;
+
+  /* Layout widths */
+  --maxw:       1200px;
+  --maxw-wide:  1320px;
+  --maxw-prose: 64ch;
+
+  /* Vertical rhythm */
+  --section-y: clamp(64px, 9vw, 120px);
+
+  /* Orb palette — from the HaloBits Landing design */
+  --vb: oklch(0.58 0.14 255);   /* blue-slate   */
+  --vm: oklch(0.50 0.09 335);   /* dusty mauve  */
+  --vo: oklch(0.70 0.13 48);    /* warm orange  */
+  --or: oklch(0.62 0.13 42);    /* ambient orange */
+  --pw: oklch(0.64 0.12 258);   /* blue-purple  */
+  --cr: oklch(0.83 0.06 82);    /* warm cream   */
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- View Transitions -------------------------------------------------------
+   ::view-transition-old = the page leaving
+   ::view-transition-new = the page entering
+   The background gradient stays, only the page content fades — so the dark-to-
+   blue body gradient feels continuous as you navigate between pages. ---------- */
+::view-transition-old(root) {
+  animation: 220ms cubic-bezier(0.4, 0, 1, 1) both vt-out;
+}
+::view-transition-new(root) {
+  animation: 340ms cubic-bezier(0, 0, 0.2, 1) 60ms both vt-in;
+}
+@keyframes vt-out {
+  to { opacity: 0; transform: scale(0.985) translateY(-4px); }
+}
+@keyframes vt-in {
+  from { opacity: 0; transform: scale(0.985) translateY(6px); }
+}
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
+/* --- Z-index system ------------------------------------------------------
+   0-9  : background blobs / orbs (behind glass)
+   10   : glass layer (fixed)
+   20   : page content (sections, text)
+   100  : nav
+   9999 : grain overlay (texture, above everything)
+   ------------------------------------------------------------------------ */
+
+/* --- CSS-only float/drift animations for orbs ---------------------------- */
+@keyframes hb-float-a {
+  0%, 100% { transform: translate(0, 0); }
+  50%       { transform: translate(-10px, -18px); }
+}
+@keyframes hb-float-b {
+  0%, 100% { transform: translate(0, 0); }
+  50%       { transform: translate(14px, -10px); }
+}
+@keyframes hb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(-20px, 30px) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .haura, .vorb, .blob { animation: none !important; }
+}
+
+/* --- Reset --------------------------------------------------------------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  /* Gradient spans the full document height — each section is transparent
+     so this shows through. Top = hero dark, bottom = brand blue at the CTA.
+     Percentages are approximate based on the 5-section page structure. */
+  background: linear-gradient(
+    to bottom,
+    #0c0b0a  0%,    /* hero: near-black                */
+    #0c0b0a 30%,    /* philosophy: stays dark           */
+    #0c0d18 48%,    /* what we build: first hint of blue*/
+    #0e1540 62%,    /* how we partner: getting blue     */
+    #152990 78%,    /* approaching CTA                  */
+    #1f3fc3 92%,    /* CTA: full brand blue             */
+    #1f3fc3 100%
+  );
+  color: var(--ink);
+  font-family: 'Geist', -apple-system, system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.011em;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* --- Typography ---------------------------------------------------------- */
+h1, .display-h {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.97;
+  letter-spacing: -0.04em;
+}
+h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 4.8vw, 3.6rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+h3 {
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+p, li { font-size: 16px; }
+
+.lead {
+  font-size: clamp(0.95rem, 1.5vw, 1.12rem);
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+em.ac { font-style: normal; color: var(--accent-light); }
+
+a { color: var(--accent-light); text-decoration: none; }
+a:hover { color: var(--bg); }
+
+/* --- Layout -------------------------------------------------------------- */
+.container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 5vw, 2.5rem);
+}
+.container-wide {
+  max-width: var(--maxw-wide);
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 5vw, 2.5rem);
+}
+
+/* --- Tag pill ------------------------------------------------------------ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 7px 14px;
+
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: var(--pill);
+  font-family: 'Geist', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: transform 0.15s var(--ease), opacity 0.15s;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary, .btn-solid { background: var(--fg); color: #0c0b0a; }
+.btn-primary:hover, .btn-solid:hover { opacity: 0.9; }
+.btn-ghost {
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid var(--line-2);
+}
+.btn-ghost:hover { background: rgba(240, 235, 229, 0.06); color:var(--fg)}
+
+/* --- Cards / surfaces ---------------------------------------------------- */
+.paper {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-card);
+}
+
+/* --- Section bands ------------------------------------------------------- */
+.band {
+  position: relative;
+  z-index: 20; /* above glass layer (z-index: 10) */
+  width: 100%;
+  padding-block: var(--section-y);
+  overflow: hidden;
+}
+/* All sections are transparent — the body gradient flows through.
+   band-surface adds a faint white tint that fades in/out at its edges
+   so sections blend into each other instead of cutting hard. */
+.band-bg { background: transparent; }
+
+.band-surface {
+  background: transparent;
+}
+/* band-surface: section fades are now handled per-component via ::before/::after
+   on the section-specific class, so there's no conflict. */
+
+/* --- Shared blob helper -------------------------------------------------- */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}

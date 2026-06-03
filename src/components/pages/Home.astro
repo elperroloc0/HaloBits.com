@@ -1,0 +1,29 @@
+---
+// pages/Home.astro — the homepage BODY. Composes the section components in order.
+// The thin route files (src/pages/index.astro and src/pages/es/index.astro) just
+// render <Home lang="en" /> and <Home lang="es" />, so the page is defined once.
+import Base from '../../layouts/Base.astro';
+import Hero from '../sections/Hero.astro';
+import Philosophy from '../sections/Philosophy.astro';
+import WhatWeBuild from '../sections/WhatWeBuild.astro';
+import HowWePartner from '../sections/HowWePartner.astro';
+import CTA from '../sections/CTA.astro';
+import { content } from '../../i18n/content';
+import type { Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const meta = content[lang].meta.home;
+---
+
+<Base lang={lang} title={meta.title} description={meta.description}>
+  <!-- Home = pure company identity. Products live on their own sites.
+       Shipped/Concierge section is deliberately absent here. -->
+  <Hero lang={lang} />
+  <Philosophy lang={lang} />
+  <WhatWeBuild lang={lang} />
+  <HowWePartner lang={lang} />
+  <CTA lang={lang} />
+</Base>

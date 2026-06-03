@@ -1,0 +1,10 @@
+# robots.txt — instructions for search-engine crawlers.
+# Files in public/ are served verbatim at the site root, so this lives at
+# https://halobits.com/robots.txt
+
+# Allow every crawler to index everything.
+User-agent: *
+Allow: /
+
+# Point crawlers at the sitemap the @astrojs/sitemap integration generates.
+Sitemap: https://halobits.com/sitemap-index.xml

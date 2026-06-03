@@ -1,0 +1,36 @@
+---
+// Section.astro — a FULL-BLEED band. This is the fix for "the site is a narrow
+// column on a big monitor."
+//
+// How it works: a <section> is block-level, so with nothing capping its width it
+// stretches edge-to-edge across the viewport — its background fills the whole
+// screen. The `.container` INSIDE then caps the *content* to a readable measure
+// and centres it. So the page feels full-width, while text never becomes an
+// unreadable 2000px-long line. Alternating `tone` backgrounds give the page
+// rhythm as you scroll.
+interface Props {
+  tone?: 'bg' | 'surface'; // which background this band uses
+  wide?: boolean; // use the wider content measure (hero / showcase rows)
+  id?: string;
+}
+const { tone = 'bg', wide = false, id } = Astro.props;
+---
+
+<section class:list={['band', `band-${tone}`]} id={id}>
+  <div class:list={[wide ? 'container-wide' : 'container']}>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .band {
+    width: 100%;
+    padding-block: var(--section-y); /* fluid top/bottom rhythm */
+  }
+  .band-bg {
+    background: var(--bg);
+  }
+  .band-surface {
+    background: var(--surface);
+  }
+</style>

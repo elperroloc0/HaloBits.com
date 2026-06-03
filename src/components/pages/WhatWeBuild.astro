@@ -1,0 +1,94 @@
+---
+// pages/WhatWeBuild.astro — the "What we build" page body: the range of products
+// HaloBits can build (possibilities), a note on the stack, then the shared
+// partner-process and CTA sections.
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import HowWePartner from '../sections/HowWePartner.astro';
+import CTA from '../sections/CTA.astro';
+import { content } from '../../i18n/content';
+import type { Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = content[lang].whatWeBuildPage;
+const meta = content[lang].meta.whatWeBuild;
+---
+
+<Base lang={lang} title={meta.title} description={meta.description}>
+  <Section tone="bg">
+    <div class="s-head">
+      <span class="tag">{c.kicker}</span>
+      <h1>{c.title}</h1>
+      <p class="lead">{c.lead}</p>
+    </div>
+    <div class="poss">
+      {
+        c.possibilities.map((p) => (
+          <div class="paper poss-item">
+            <h3>{p.title}</h3>
+            <p>{p.body}</p>
+          </div>
+        ))
+      }
+    </div>
+    <div class="paper tech">
+      <h3>{c.techNote.title}</h3>
+      <p>{c.techNote.body}</p>
+    </div>
+  </Section>
+
+  <HowWePartner lang={lang} />
+  <CTA lang={lang} />
+</Base>
+
+<style>
+  .s-head {
+    max-width: 680px;
+    margin-bottom: 48px;
+  }
+  .s-head .tag {
+    margin-bottom: 18px;
+  }
+  .s-head h1 {
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    margin-bottom: 18px;
+  }
+  .poss {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .poss-item {
+    padding: 26px;
+  }
+  .poss-item h3 {
+    margin-bottom: 8px;
+  }
+  .poss-item p {
+    color: var(--muted);
+    max-width: 48ch;
+  }
+  .tech {
+    margin-top: 18px;
+    padding: 30px;
+    background: var(--accent);
+    color: #fff;
+    border-color: transparent;
+  }
+  .tech h3 {
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .tech p {
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 70ch;
+  }
+  @media (max-width: 720px) {
+    .poss {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

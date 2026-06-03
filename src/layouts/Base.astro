@@ -1,0 +1,120 @@
+---
+// Base.astro — HTML shell with:
+//   • #grain   — fixed noise overlay (mix-blend-mode:overlay) for the grainy
+//                texture on gradient blobs across the whole page
+//   • .glass   — fixed frosted-glass layer (backdrop-filter:blur) between
+//                the hero background orbs (z-index:0-5) and the page content
+//                (z-index:20). Stays fixed as the user scrolls.
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { ViewTransitions } from 'astro:transitions';
+import { getAlternateUrls, type Lang } from '../i18n/utils';
+import '../styles/global.css';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+}
+const { lang, title, description = 'HaloBits — not a service, a partner.' } = Astro.props;
+
+const alt = getAlternateUrls(Astro.url);
+const canonicalURL = new URL(alt[lang], Astro.site);
+const enURL = new URL(alt.en, Astro.site);
+const esURL = new URL(alt.es, Astro.site);
+const ogImage = new URL('/og.png', Astro.site);
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang="en" href={enURL} />
+    <link rel="alternate" hreflang="es" href={esURL} />
+    <link rel="alternate" hreflang="x-default" href={enURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_US' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Geist:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- View Transitions: enables seamless animated navigation between pages.
+         Uses the browser's native View Transitions API — no JS bundle added.
+         Falls back to instant navigation on unsupported browsers (Firefox). -->
+    <ViewTransitions />
+  </head>
+  <body>
+    <!-- transition:persist keeps grain and nav alive across page transitions
+         so they don't flash or re-render — they just stay in place. -->
+    <div id="grain" aria-hidden="true" transition:persist></div>
+
+    <Nav lang={lang} transition:persist />
+    <slot />
+    <Footer lang={lang} />
+  </body>
+</html>
+
+<!-- ── Grain generator script ─────────────────────────────────────────────
+     Runs once on load. Creates a 256×256 random noise canvas, converts it
+     to a data URL, and tiles it as the grain div's background. Each page
+     load gets a slightly different grain (canvas random) which looks natural. -->
+<script>
+(function () {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const ctx = c.getContext('2d');
+  if (!ctx) return;
+  const d = ctx.createImageData(256, 256);
+  for (let i = 0; i < d.data.length; i += 4) {
+    const v = (Math.random() * 255) | 0;
+    d.data[i] = d.data[i + 1] = d.data[i + 2] = v;
+    d.data[i + 3] = 255;
+  }
+  ctx.putImageData(d, 0, 0);
+  const el = document.getElementById('grain');
+  if (el) el.style.backgroundImage = `url(${c.toDataURL()})`;
+})();
+</script>
+
+<style is:global>
+  /* Grain: fixed, full-screen, above everything */
+  #grain {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    opacity: 0.055;
+    mix-blend-mode: overlay;
+    background-repeat: repeat;
+    background-size: 256px 256px;
+    pointer-events: none;
+  }
+
+  /* Glass: fixed, full-screen overlay.
+     No backdrop-filter here — that was causing Chrome to suppress section
+     content above it. The "frosted" quality comes from:
+       • The grain overlay (#grain) — adds the grainy rough texture
+       • The haura blobs in the hero — large blurred colour glow visible through
+     This is a very subtle tint only, so it doesn't affect legibility. */
+  .glass {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: rgba(12, 11, 10, 0.04);
+    pointer-events: none;
+  }
+</style>

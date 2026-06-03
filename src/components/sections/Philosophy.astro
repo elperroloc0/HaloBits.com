@@ -1,0 +1,107 @@
+---
+// Philosophy.astro — dark section with blue-purple ambient blobs.
+// The #grain overlay in Base.astro gives the blobs their grainy texture.
+import { content } from '../../i18n/content';
+import type { Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const c = content[lang].philosophy;
+---
+
+<section class="phil-section band band-bg">
+  <!-- Grainy blobs: blue-purple left, amber bottom-right -->
+  <div class="blob pb1" aria-hidden="true"></div>
+  <div class="blob pb2" aria-hidden="true"></div>
+  <div class="blob pb3" aria-hidden="true"></div>
+
+  <div class="container" style="position:relative;z-index:1;">
+    <div class="s-head">
+      <span class="tag">{c.kicker}</span>
+      <h2>{c.title}</h2>
+      <p class="lead phil-lead">{c.lead}</p>
+    </div>
+    <div class="phil-cols">
+      {c.pillars.map((p) => (
+        <div class="pcol">
+          <div class="pcol-title">{p.title}</div>
+          <div class="pcol-body">{p.body}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .phil-section { overflow: hidden; }
+
+  /* Gradient fades at top and bottom — blends this section into the
+     adjacent ones instead of cutting hard. Lives at z:0, behind text (z:1). */
+  .phil-section::before,
+  .phil-section::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 140px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .phil-section::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(12,11,10,0.70), transparent);
+  }
+  .phil-section::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(12,11,10,0.70), transparent);
+  }
+
+  /* Blob palette: blue-purple + amber */
+  .pb1 {
+    width: 700px; height: 700px;
+    left: -200px; top: 0;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / .28), transparent 70%);
+    filter: blur(90px); z-index: 0;
+  }
+  .pb2 {
+    width: 500px; height: 500px;
+    right: -100px; bottom: 0;
+    background: radial-gradient(circle, oklch(0.62 0.13 42 / .22), transparent 70%);
+    filter: blur(80px); z-index: 0;
+  }
+  .pb3 {
+    width: 380px; height: 380px;
+    left: 40%; bottom: 20%;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / .12), transparent 70%);
+    filter: blur(70px); z-index: 0;
+  }
+
+  .s-head {
+    max-width: 640px;
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  .phil-lead { max-width: 560px; }
+
+  .phil-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    border-top: 1px solid var(--line);
+    padding-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  .pcol-title {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 9px;
+    color: var(--fg);
+  }
+  .pcol-body {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  @media (max-width: 820px) {
+    .phil-cols { grid-template-columns: 1fr; gap: 22px; }
+  }
+</style>
