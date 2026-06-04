@@ -1,9 +1,8 @@
 ---
-// pages/About.astro — the studio story, values, and how-we-work (reusing the
-// shared HowWePartner + CTA sections).
+// pages/About.astro — studio story. Essential intro + detail blocks.
+// "Three steps" (HowWePartner) deliberately NOT here — it lives only on home.
 import Base from '../../layouts/Base.astro';
 import Section from '../Section.astro';
-import HowWePartner from '../sections/HowWePartner.astro';
 import CTA from '../sections/CTA.astro';
 import { content } from '../../i18n/content';
 import type { Lang } from '../../i18n/utils';
@@ -17,32 +16,34 @@ const meta = content[lang].meta.about;
 ---
 
 <Base lang={lang} title={meta.title} description={meta.description}>
-  <Section tone="bg">
+  <Section tone="bg" blobs blobVariant="a">
     <div class="s-head">
       <span class="tag">{c.kicker}</span>
       <h1>{c.title}</h1>
     </div>
-    <div class="prose">
-      {c.paragraphs.map((p) => <p>{p}</p>)}
-      <p class="signoff">{c.signoff}</p>
-    </div>
-  </Section>
 
-  <Section tone="surface">
-    <h2 class="values-title">{c.valuesTitle}</h2>
-    <div class="values">
+    <!-- Lo esencial — the one paragraph that captures the studio -->
+    <p class="essential">{c.essential}</p>
+
+    <!-- Los detalles — labelled blocks (What we do / Who we are / …) -->
+    <div class="details">
       {
-        c.values.map((v) => (
-          <div class="value">
-            <h3>{v.title}</h3>
-            <p>{v.body}</p>
+        c.details.map((d) => (
+          <div class="detail">
+            <h3 class="detail-title">{d.title}</h3>
+            <p class="detail-body">{d.body}</p>
           </div>
         ))
       }
     </div>
+
+    <!-- FOUNDER DROP-IN ───────────────────────────────────────────────
+         When ready, replace this block with the founder's name, photo and a
+         one-liner (e.g. "— Name, founder, Miami."). It's the biggest trust
+         jump on the page. Nothing else needs to change. -->
+    {/* <div class="founder"> … </div> */}
   </Section>
 
-  <HowWePartner lang={lang} />
   <CTA lang={lang} />
 </Base>
 
@@ -54,42 +55,43 @@ const meta = content[lang].meta.about;
     margin-bottom: 18px;
   }
   .s-head h1 {
-    font-size: clamp(2.4rem, 5vw, 3.6rem);
-    max-width: 18ch;
+    font-size: clamp(2.6rem, 6vw, 4.6rem);
+    max-width: 16ch;
   }
-  .prose {
+  /* The essential paragraph reads larger — it's the lede */
+  .essential {
     max-width: var(--maxw-prose);
-  }
-  .prose p {
-    color: var(--ink);
-    margin-bottom: 18px;
-    font-size: 17px;
-    line-height: 1.7;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    line-height: 1.5;
     font-weight: 300;
+    color: var(--fg);
+    margin-bottom: clamp(3rem, 6vw, 4.5rem);
   }
-  .prose .signoff {
-    color: var(--muted);
-    margin-top: 28px;
-  }
-  .values-title {
-    margin-bottom: 36px;
-  }
-  .values {
+  /* Detail blocks in two columns on wide screens */
+  .details {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 28px;
+    gap: 36px 48px;
+    max-width: 980px;
+    border-top: 1px solid var(--line);
+    padding-top: clamp(2.5rem, 5vw, 3.5rem);
   }
-  .value h3 {
-    margin-bottom: 8px;
+  .detail-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--fg);
+    margin-bottom: 10px;
   }
-  .value p {
+  .detail-body {
+    font-size: 15px;
     color: var(--muted);
+    line-height: 1.7;
     max-width: 46ch;
   }
   @media (max-width: 720px) {
-    .values {
+    .details {
       grid-template-columns: 1fr;
-      gap: 22px;
+      gap: 28px;
     }
   }
 </style>

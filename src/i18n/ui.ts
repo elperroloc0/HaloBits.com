@@ -22,6 +22,7 @@ export interface Ui {
   nav: {
     whatWeBuild: string;
     about: string;
+    faq: string;
     contact: string;
   };
   langSwitch: {
@@ -37,7 +38,7 @@ export interface Ui {
 
 export const ui: Record<Lang, Ui> = {
   en: {
-    nav: { whatWeBuild: 'What we build', about: 'About', contact: 'Contact' },
+    nav: { whatWeBuild: 'What we build', about: 'About', faq: 'FAQ', contact: 'Contact' },
     langSwitch: { label: 'Change language' },
     footer: {
       tagline: 'Not a service. A partner.',
@@ -46,7 +47,12 @@ export const ui: Record<Lang, Ui> = {
     },
   },
   es: {
-    nav: { whatWeBuild: 'Qué construimos', about: 'Nosotros', contact: 'Contacto' },
+    nav: {
+      whatWeBuild: 'Qué construimos',
+      about: 'Nosotros',
+      faq: 'Preguntas',
+      contact: 'Contacto',
+    },
     langSwitch: { label: 'Cambiar idioma' },
     footer: {
       tagline: 'No es un servicio. Es un socio.',

@@ -1,0 +1,204 @@
+---
+// pages/Faq.astro — accordion FAQ. Each question is a <button> that toggles an
+// answer open/closed. The answer animates with the grid-template-rows 0fr→1fr
+// trick (smooth height animation, no fixed max-height guessing). Accordion
+// behaviour (one open at a time) + the toggle are handled by a tiny script.
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import CTA from '../sections/CTA.astro';
+import { content } from '../../i18n/content';
+import { localizePath, type Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = content[lang].faq;
+const meta = content[lang].meta.faq;
+
+// Resolve an FAQ link: internal paths (start with "/") get localized; external
+// links (http / mailto) are used as-is.
+function resolveHref(href: string) {
+  return href.startsWith('/') ? localizePath(href, lang) : href;
+}
+---
+
+<Base lang={lang} title={meta.title} description={meta.description}>
+  <Section tone="bg" blobs blobVariant="b">
+    <div class="s-head">
+      <span class="tag">{c.kicker}</span>
+      <h1>{c.title}</h1>
+    </div>
+
+    <div class="faq">
+      {
+        c.items.map((item) => (
+          <div class="faq-item">
+            <button class="faq-q" type="button" aria-expanded="false">
+              <span class="faq-q-text">{item.q}</span>
+              <span class="faq-icon" aria-hidden="true" />
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                <p>{item.a}</p>
+                {item.linkLabel && item.linkHref && (
+                  <a class="faq-link" href={resolveHref(item.linkHref)}>
+                    {item.linkLabel}
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <CTA lang={lang} />
+</Base>
+
+<!-- Accordion behaviour. Wrapped so it re-runs after Astro View Transitions
+     navigations (astro:page-load fires on first load AND after each swap). -->
+<script>
+  function initFaq() {
+    document.querySelectorAll<HTMLElement>('.faq-item').forEach((item) => {
+      const btn = item.querySelector<HTMLButtonElement>('.faq-q');
+      if (!btn || btn.dataset.bound) return;
+      btn.dataset.bound = 'true';
+      btn.addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        // Close every item (accordion = one open at a time)
+        document.querySelectorAll<HTMLElement>('.faq-item.open').forEach((openItem) => {
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-q')?.setAttribute('aria-expanded', 'false');
+        });
+        // Open the clicked one (unless it was already open → just collapse)
+        if (!isOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initFaq);
+</script>
+
+<style>
+  .s-head {
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  .s-head .tag {
+    margin-bottom: 18px;
+  }
+  .s-head h1 {
+    font-size: clamp(2.6rem, 6vw, 4.6rem);
+    max-width: 16ch;
+  }
+
+  .faq {
+    max-width: 780px;
+    border-top: 1px solid var(--line);
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* Question row — full-width button */
+  .faq-q {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    transition: color 0.15s;
+  }
+  .faq-q:hover {
+    color: var(--accent-light);
+  }
+
+  /* Plus / minus icon built from two pseudo-bars */
+  .faq-icon {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .faq-icon::before,
+  .faq-icon::after {
+    content: '';
+    position: absolute;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.3s var(--ease), opacity 0.3s;
+  }
+  .faq-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+  .faq-icon::after {
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+  }
+  /* When open, rotate the vertical bar away → "+" becomes "−" */
+  .faq-item.open .faq-icon::after {
+    transform: translateX(-50%) rotate(90deg);
+    opacity: 0;
+  }
+  .faq-item.open .faq-q {
+    color: var(--accent-light);
+  }
+
+  /* Answer — animated via grid-template-rows 0fr → 1fr */
+  .faq-a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s var(--ease);
+  }
+  .faq-item.open .faq-a {
+    grid-template-rows: 1fr;
+  }
+  .faq-a-inner {
+    overflow: hidden;
+  }
+  .faq-a-inner p {
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 64ch;
+    padding: 0 4px 8px;
+  }
+  .faq-link {
+    display: inline-block;
+    margin: 6px 4px 24px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--accent-light);
+  }
+  .faq-link:hover {
+    color: var(--fg);
+  }
+
+  /* No-JS fallback: if the script never runs, show all answers so content is
+     never hidden. (Astro ships this script, but defensive is good.) */
+  @media (scripting: none) {
+    .faq-a {
+      grid-template-rows: 1fr;
+    }
+  }
+</style>

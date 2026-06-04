@@ -5,22 +5,29 @@
 import { content } from '../../i18n/content';
 import { localizePath, type Lang } from '../../i18n/utils';
 
+// Optional title/body/button override the default home CTA copy, so the same
+// styled accent band can be reused with page-specific wording.
 interface Props {
   lang: Lang;
+  title?: string;
+  body?: string;
+  button?: string;
 }
 const { lang } = Astro.props;
 const c = content[lang].cta;
+const title = Astro.props.title ?? c.title;
+const body = Astro.props.body ?? c.body;
+const button = Astro.props.button ?? c.button;
 ---
 
 <section class="sec-cta">
   <!-- Aura blobs from the design — blue top-right, orange bottom-left -->
   <div class="cta-aura aura-blue" aria-hidden="true"></div>
 
-
   <div class="cta-inner">
-    <h2>{c.title}</h2>
-    <p class="lead">{c.body}</p>
-    <a href={localizePath('/contact/', lang)} class="btn-white">{c.button} →</a>
+    <h2>{title}</h2>
+    <p class="lead">{body}</p>
+    <a href={localizePath('/contact/', lang)} class="btn-white">{button} →</a>
   </div>
 </section>
 

@@ -1,23 +1,35 @@
 ---
-// Section.astro — a FULL-BLEED band. This is the fix for "the site is a narrow
-// column on a big monitor."
+// Section.astro — a FULL-BLEED band. Fixes "the site is a narrow column".
 //
-// How it works: a <section> is block-level, so with nothing capping its width it
-// stretches edge-to-edge across the viewport — its background fills the whole
-// screen. The `.container` INSIDE then caps the *content* to a readable measure
-// and centres it. So the page feels full-width, while text never becomes an
-// unreadable 2000px-long line. Alternating `tone` backgrounds give the page
-// rhythm as you scroll.
+// A <section> is block-level, so with nothing capping its width it stretches
+// edge-to-edge — its background fills the screen. The `.container` inside caps
+// the *content* to a readable measure and centres it.
+//
+// `blobs` renders ambient coloured blobs behind the content (same look as the
+// landing sections). The global #grain overlay in Base.astro then textures them,
+// giving the page the grainy atmosphere. `blobVariant` picks an arrangement so
+// stacked sections don't look identical.
 interface Props {
   tone?: 'bg' | 'surface'; // which background this band uses
   wide?: boolean; // use the wider content measure (hero / showcase rows)
   id?: string;
+  blobs?: boolean; // render ambient grainy colour blobs behind content
+  blobVariant?: 'a' | 'b' | 'c';
 }
-const { tone = 'bg', wide = false, id } = Astro.props;
+const { tone = 'bg', wide = false, id, blobs = false, blobVariant = 'a' } = Astro.props;
 ---
 
 <section class:list={['band', `band-${tone}`]} id={id}>
-  <div class:list={[wide ? 'container-wide' : 'container']}>
+  {
+    blobs && (
+      <div class:list={['band-blobs', `bv-${blobVariant}`]} aria-hidden="true">
+        <span class="bb b1" />
+        <span class="bb b2" />
+        <span class="bb b3" />
+      </div>
+    )
+  }
+  <div class:list={[wide ? 'container-wide' : 'container', 'band-inner']}>
     <slot />
   </div>
 </section>
@@ -32,5 +44,101 @@ const { tone = 'bg', wide = false, id } = Astro.props;
   }
   .band-surface {
     background: var(--surface);
+  }
+
+  /* Content sits above the blobs */
+  .band-inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ambient blobs layer — clipped to the band (global .band has overflow:hidden) */
+  .band-blobs {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .bb {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  /* Variant A — blue top-right, amber bottom-left, faint blue center */
+  .bv-a .b1 {
+    width: 680px;
+    height: 680px;
+    right: -120px;
+    top: -90px;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / 0.4), transparent 70%);
+    filter: blur(75px);
+  }
+  .bv-a .b2 {
+    width: 520px;
+    height: 520px;
+    left: -110px;
+    bottom: -70px;
+    background: radial-gradient(circle, oklch(0.62 0.13 42 / 0.32), transparent 70%);
+    filter: blur(80px);
+  }
+  .bv-a .b3 {
+    width: 400px;
+    height: 400px;
+    left: 42%;
+    top: 28%;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / 0.16), transparent 70%);
+    filter: blur(80px);
+  }
+
+  /* Variant B — mauve left, blue right */
+  .bv-b .b1 {
+    width: 600px;
+    height: 600px;
+    left: -140px;
+    top: -70px;
+    background: radial-gradient(circle, oklch(0.5 0.09 335 / 0.34), transparent 70%);
+    filter: blur(80px);
+  }
+  .bv-b .b2 {
+    width: 560px;
+    height: 560px;
+    right: -120px;
+    bottom: -90px;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / 0.34), transparent 70%);
+    filter: blur(80px);
+  }
+  .bv-b .b3 {
+    width: 360px;
+    height: 360px;
+    right: 30%;
+    top: 18%;
+    background: radial-gradient(circle, oklch(0.62 0.13 42 / 0.18), transparent 70%);
+    filter: blur(75px);
+  }
+
+  /* Variant C — amber right, blue bottom-left */
+  .bv-c .b1 {
+    width: 640px;
+    height: 640px;
+    right: -160px;
+    top: -110px;
+    background: radial-gradient(circle, oklch(0.62 0.13 42 / 0.34), transparent 70%);
+    filter: blur(85px);
+  }
+  .bv-c .b2 {
+    width: 500px;
+    height: 500px;
+    left: -100px;
+    bottom: -50px;
+    background: radial-gradient(circle, oklch(0.64 0.12 258 / 0.32), transparent 70%);
+    filter: blur(80px);
+  }
+  .bv-c .b3 {
+    width: 340px;
+    height: 340px;
+    left: 45%;
+    bottom: 15%;
+    background: radial-gradient(circle, oklch(0.5 0.09 335 / 0.16), transparent 70%);
+    filter: blur(75px);
   }
 </style>

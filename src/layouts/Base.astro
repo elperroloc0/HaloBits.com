@@ -7,7 +7,7 @@
 //                (z-index:20). Stays fixed as the user scrolls.
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import { getAlternateUrls, type Lang } from '../i18n/utils';
 import '../styles/global.css';
 
@@ -56,7 +56,7 @@ const ogImage = new URL('/og.png', Astro.site);
     <!-- View Transitions: enables seamless animated navigation between pages.
          Uses the browser's native View Transitions API — no JS bundle added.
          Falls back to instant navigation on unsupported browsers (Firefox). -->
-    <ViewTransitions />
+    <ClientRouter />
   </head>
   <body>
     <!-- transition:persist keeps grain and nav alive across page transitions
@@ -97,7 +97,7 @@ const ogImage = new URL('/og.png', Astro.site);
     position: fixed;
     inset: 0;
     z-index: 9999;
-    opacity: 0.055;
+    opacity: 0.08;
     mix-blend-mode: overlay;
     background-repeat: repeat;
     background-size: 256px 256px;

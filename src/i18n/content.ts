@@ -27,9 +27,24 @@ interface ShippedItem extends TitleBody {
   href: string;
   cta: string;
 }
+interface FaqItem {
+  q: string;
+  a: string;
+  /** Optional inline link at the end of the answer (e.g. → Contact). */
+  linkLabel?: string;
+  /** Internal path (localized automatically) or absolute/mailto URL. */
+  linkHref?: string;
+}
 
 export interface SiteContent {
-  meta: { home: Meta; whatWeBuild: Meta; about: Meta; contact: Meta; notFound: Meta };
+  meta: {
+    home: Meta;
+    whatWeBuild: Meta;
+    about: Meta;
+    contact: Meta;
+    faq: Meta;
+    notFound: Meta;
+  };
   hero: { slogan: string; sub: string; ctaBuild: string; ctaTalk: string };
   philosophy: { kicker: string; title: string; lead: string; pillars: TitleBody[] };
   whatWeBuild: {
@@ -45,17 +60,28 @@ export interface SiteContent {
   whatWeBuildPage: {
     kicker: string;
     title: string;
-    lead: string;
-    possibilities: TitleBody[];
-    techNote: TitleBody;
+    // LIVE NOW — Concierge hero block
+    live: { label: string; name: string; body: string; cta: string; href: string };
+    // Capabilities grid
+    capKicker: string;
+    capTitle: string;
+    capLead: string;
+    capabilities: TitleBody[];
+    // On the way (roadmap teaser)
+    next: { kicker: string; title: string; body: string };
+    // Closing CTA (page-specific copy)
+    cta: { title: string; body: string; button: string };
   };
   about: {
     kicker: string;
     title: string;
-    paragraphs: string[];
-    valuesTitle: string;
-    values: TitleBody[];
-    signoff: string;
+    essential: string;
+    details: TitleBody[];
+  };
+  faq: {
+    kicker: string;
+    title: string;
+    items: FaqItem[];
   };
   contact: {
     kicker: string;
@@ -93,6 +119,10 @@ export const content: Record<Lang, SiteContent> = {
       contact: {
         title: 'Contact — HaloBits',
         description: "Tell us what eats your day. Let's see what we can build together.",
+      },
+      faq: {
+        title: 'FAQ — HaloBits',
+        description: 'Straight answers about how HaloBits builds custom software, pricing, and what to expect.',
       },
       notFound: { title: 'Page not found — HaloBits', description: '' },
     },
@@ -194,64 +224,136 @@ export const content: Record<Lang, SiteContent> = {
     },
     whatWeBuildPage: {
       kicker: 'What we build',
-      title: 'Sized to your problem — from a single assistant to a whole platform.',
-      lead: 'Most studios sell you the biggest thing they can. We build the smallest thing that actually fixes the problem, then grow it with you. Here is the range.',
-      possibilities: [
+      title: 'We take the routine, you take the joy.',
+      live: {
+        label: 'Running today',
+        name: 'Concierge AI',
+        body: 'A virtual receptionist that answers your phone around the clock — picking up, booking, and remembering your customers in English and Spanish — so a busy moment never costs you a booking.',
+        cta: 'See Concierge AI',
+        href: 'https://concierge.halobits.com',
+      },
+      capKicker: 'What we do',
+      capTitle: 'A few things we build well.',
+      capLead:
+        "These aren't products off a shelf — each one is built to fit your business. If your problem is on this list, it's something we've done before and can do again.",
+      capabilities: [
         {
-          title: 'Answer every call',
-          body: 'An AI receptionist that picks up 24/7, books tables, and texts guests back — bilingual, always patient.',
+          title: 'Web design & development',
+          body: 'Custom websites and web applications, built clean and fast — from a landing page to a full customer-facing platform.',
         },
         {
-          title: 'Remember every customer',
-          body: 'A lightweight CRM with caller memory, so repeat guests feel known and your team always has context.',
+          title: 'Automation scripts',
+          body: 'Repetitive tasks that eat your day — data entry, file processing, scheduled reports, notifications — turned into software that runs without you.',
         },
         {
-          title: 'Understand your week',
-          body: 'AI-written reports and clean dashboards that turn raw calls into decisions, in plain language.',
+          title: 'Data systems & databases',
+          body: 'Structured storage for the information your business runs on: customer records, inventory, transactions, history.',
         },
         {
-          title: 'Automate the boring middle',
-          body: 'The repetitive work between a call and a happy customer — confirmations, follow-ups, reminders — handled.',
+          title: 'Document parsing & data extraction',
+          body: 'Software that reads invoices, receipts, forms, and PDFs and pulls the data you need into a clean, usable format.',
         },
         {
-          title: 'Something only you need',
-          body: 'Bespoke tools for businesses with their own quirks: custom flows, custom interface, dedicated support.',
+          title: 'Third-party integrations',
+          body: 'Connecting the tools you already use — payment processors, phone systems, booking platforms, external APIs — so they work together instead of in silos.',
+        },
+        {
+          title: 'Internal dashboards & admin portals',
+          body: 'A private interface for your team to see what\'s happening, manage records, and run the day without digging through spreadsheets.',
+        },
+        {
+          title: 'File storage & management systems',
+          body: 'Secure, private systems for storing, organizing, and sharing files within your business — without relying on consumer cloud tools.',
         },
       ],
-      techNote: {
-        title: 'Built on tools we trust',
-        body: 'We build on modern, dependable foundations — including Claude for the language work — and we keep the stack boring on purpose. Reliable beats clever.',
+      next: {
+        kicker: 'On the way',
+        title: "More is coming.",
+        body: "We're picking the next problem worth solving for small businesses. Have one that eats your day? That conversation is free — tell us.",
+      },
+      cta: {
+        title: "Let's build something that will make your life easier.",
+        body: "Tell us what eats your day, and we'll stick around to make sure it stays gone.",
+        button: 'Start a conversation',
       },
     },
     about: {
       kicker: 'About',
-      title: 'We make AI that earns its keep.',
-      paragraphs: [
-        'HaloBits is a small studio in Miami building AI tools for small and mid-sized businesses. We started because the businesses we love — restaurants, salons, clinics, family shops — keep losing customers to dropped calls, missed messages, and software that was never built for them.',
-        "We believe the best technology disappears. It doesn't ask for attention; it quietly gives you your time back. So we build calm, reliable tools, in English and Spanish, and we judge them by one thing: did your day get easier?",
-        'And we don\'t sell and disappear. We stay — watching, fixing, improving — because a partner is measured by what happens after the launch, not before it.',
-        "We move slowly on copy, quickly on bugs, and we never ship anything we wouldn't run in our own shop.",
+      title: 'We make software that earns its keep.',
+      essential:
+        'HaloBits is a software studio in Miami building custom software for small and mid-sized businesses — the capability big companies have always had, now within reach of the ones that were priced out of it. We design it, build it, and stay to run it with you. Our first tool is already live, working for a Miami business.',
+      details: [
+        {
+          title: 'What we do.',
+          body: 'We build software that takes repetitive, boring work off your plate — making it more fun, less noticeable, or even invisible. We work across the modern stack, AI included where it actually earns its place. Each tool is fit to one business at a time: we ship a working first version, refine it with you in the real world, and stay on after launch instead of selling a license and walking away.',
+        },
+        {
+          title: 'Who we are.',
+          body: 'An independent studio that handles the whole job in-house — strategy, software, and the support that comes after. You work directly with the people building your tool, start to finish.',
+        },
+        {
+          title: 'Where.',
+          body: 'Miami, Florida. Bilingual by default, English and Spanish, the way this city does business.',
+        },
+        {
+          title: 'Why we exist.',
+          body: 'Powerful software has always come with an enterprise budget and an IT team to run it. Everyone else made do. HaloBits puts that capability within reach of the businesses that were left out, and answers to one question: did your day get easier?',
+        },
+        {
+          title: 'How we work.',
+          body: "Month to month, cancel anytime, no contract that locks you in. We keep the technology quiet and dependable — the kind you forget is running — and when something breaks we're usually on it the same day.",
+        },
       ],
-      valuesTitle: 'What we hold to',
-      values: [
+    },
+    faq: {
+      kicker: 'Questions',
+      title: 'Straight answers before you commit.',
+      items: [
         {
-          title: 'Partner, not vendor',
-          body: 'We win when you win — and we stay on the line long after launch day.',
+          q: 'What kinds of software can you build?',
+          a: "A wide range — if it runs on repetition, we can probably automate it. If you're not sure your problem fits, tell us what it is — that conversation is free — and we'll tell you straight whether it's something we can build.",
+          linkLabel: 'Tell us your problem →',
+          linkHref: '/contact/',
         },
         {
-          title: 'Bilingual by birth',
-          body: 'Miami is bilingual, so everything we build is too, from the very first day.',
+          q: 'Do you only build for restaurants?',
+          a: "No. We come out of hospitality, so that's where we started, but we build for any small or mid-sized business.",
         },
         {
-          title: 'Calm technology',
-          body: 'Reliable, quiet, out of the way. The best tool is the one you forget is there.',
+          q: "We're small. Are we too small for you?",
+          a: "Almost certainly not — small is who we build for. We'd rather be the right size for you than the biggest name you can't reach on the phone. If your problem genuinely needs a large enterprise vendor, we'll tell you that too.",
         },
         {
-          title: 'Honest about scope',
-          body: 'We build the smallest thing that solves it — and tell you the truth about the rest.',
+          q: 'What does it cost?',
+          a: 'You start small — a setup fee and a monthly fee, month to month, cancel anytime. No long contract, no lock-in. We keep the specifics on each tool\'s own page so the numbers are tied to what you\'re actually getting. And if you\'d rather buy a program outright to own, we can do that too.',
+          linkLabel: 'See our tools →',
+          linkHref: '/what-we-build/',
+        },
+        {
+          q: 'What do you need from me to start?',
+          a: "Less than you'd think. We start with a conversation about your day and the one thing that's costing you most — no spec, no documents, no homework. From there we handle the building; we'll only ask for what we genuinely need along the way, like access to a tool you already use or a few minutes to see how the work really flows. You bring the business knowledge; we bring everything else.",
+        },
+        {
+          q: "How long until it's working?",
+          a: "Faster than you'd expect. You see something live in weeks. We ship a working first version early, put it in front of your real day, and refine from there.",
+        },
+        {
+          q: 'What happens after it launches?',
+          a: "A launch is the start of the relationship, not the end of the job. We stay on — watching, improving as your business changes. When something breaks, we fix it as fast as we can.",
+        },
+        {
+          q: 'Do I have to be technical?',
+          a: 'Not at all. You bring the business; we bring the software. We set it up, run it, and explain anything you want to understand in plain language.',
+        },
+        {
+          q: 'Will I actually talk to a person?',
+          a: "Yes — the people who build your tool are the people who answer you. Reach us by email or Telegram and you're talking directly to the studio, not a front desk or a ticket number.",
+        },
+        {
+          q: "What if it's not working out?",
+          a: "Then you leave, no hard feelings — that's what month-to-month means. We'd rather lose a customer cleanly than trap one. But our whole model is built so that doesn't happen: if a tool isn't earning its keep, we'll improve it until it does.",
         },
       ],
-      signoff: '— The HaloBits team',
     },
     contact: {
       kicker: 'Contact',
@@ -294,6 +396,10 @@ export const content: Record<Lang, SiteContent> = {
       contact: {
         title: 'Contacto — HaloBits',
         description: 'Cuéntanos qué te consume el día. Veamos qué podemos construir juntos.',
+      },
+      faq: {
+        title: 'Preguntas frecuentes — HaloBits',
+        description: 'Respuestas directas sobre cómo HaloBits crea software a medida, precios y qué esperar.',
       },
       notFound: { title: 'Página no encontrada — HaloBits', description: '' },
     },
@@ -395,64 +501,136 @@ export const content: Record<Lang, SiteContent> = {
     },
     whatWeBuildPage: {
       kicker: 'Qué construimos',
-      title: 'A la medida de tu problema — de un solo asistente a una plataforma entera.',
-      lead: 'La mayoría de los estudios te venden lo más grande que pueden. Nosotros construimos lo más pequeño que de verdad resuelve el problema, y luego lo hacemos crecer contigo. Este es el rango.',
-      possibilities: [
+      title: 'Nosotros la rutina, tú el placer.',
+      live: {
+        label: 'En funcionamiento',
+        name: 'Concierge AI',
+        body: 'Un recepcionista virtual que contesta tu teléfono las 24 horas — atiende, reserva y recuerda a tus clientes en inglés y español — para que un momento de ajetreo nunca te cueste una reserva.',
+        cta: 'Ver Concierge AI',
+        href: 'https://concierge.halobits.com',
+      },
+      capKicker: 'Qué hacemos',
+      capTitle: 'Algunas cosas que hacemos bien.',
+      capLead:
+        'No son productos de estantería — cada uno se construye a la medida de tu negocio. Si tu problema está en esta lista, es algo que ya hemos hecho y podemos volver a hacer.',
+      capabilities: [
         {
-          title: 'Contesta cada llamada',
-          body: 'Un recepcionista de IA que atiende 24/7, reserva mesas y responde por mensaje — bilingüe, siempre paciente.',
+          title: 'Diseño y desarrollo web',
+          body: 'Sitios y aplicaciones web a medida, limpios y rápidos — desde una landing hasta una plataforma completa de cara al cliente.',
         },
         {
-          title: 'Recuerda a cada cliente',
-          body: 'Un CRM ligero con memoria de llamadas, para que los clientes habituales se sientan reconocidos y tu equipo tenga contexto.',
+          title: 'Scripts de automatización',
+          body: 'Tareas repetitivas que te consumen el día — captura de datos, procesamiento de archivos, reportes programados, notificaciones — convertidas en software que corre sin ti.',
         },
         {
-          title: 'Entiende tu semana',
-          body: 'Reportes escritos por IA y dashboards claros que convierten llamadas en decisiones, en lenguaje sencillo.',
+          title: 'Sistemas de datos y bases de datos',
+          body: 'Almacenamiento estructurado para la información con la que funciona tu negocio: clientes, inventario, transacciones, historial.',
         },
         {
-          title: 'Automatiza el medio aburrido',
-          body: 'El trabajo repetitivo entre una llamada y un cliente feliz — confirmaciones, seguimientos, recordatorios — resuelto.',
+          title: 'Lectura de documentos y extracción de datos',
+          body: 'Software que lee facturas, recibos, formularios y PDFs y extrae los datos que necesitas a un formato limpio y usable.',
         },
         {
-          title: 'Algo que solo tú necesitas',
-          body: 'Herramientas a medida para negocios con sus propias particularidades: flujos propios, interfaz propia, soporte dedicado.',
+          title: 'Integraciones con terceros',
+          body: 'Conectamos las herramientas que ya usas — procesadores de pago, sistemas telefónicos, plataformas de reservas, APIs externas — para que trabajen juntas y no en silos.',
+        },
+        {
+          title: 'Dashboards internos y portales de administración',
+          body: 'Una interfaz privada para que tu equipo vea qué pasa, gestione registros y lleve el día sin escarbar en hojas de cálculo.',
+        },
+        {
+          title: 'Sistemas de almacenamiento de archivos',
+          body: 'Sistemas seguros y privados para guardar, organizar y compartir archivos dentro de tu negocio — sin depender de la nube de consumo.',
         },
       ],
-      techNote: {
-        title: 'Construido sobre herramientas en las que confiamos',
-        body: 'Construimos sobre bases modernas y confiables — incluido Claude para el lenguaje — y mantenemos el stack aburrido a propósito. Confiable le gana a ingenioso.',
+      next: {
+        kicker: 'En camino',
+        title: 'Viene más.',
+        body: 'Estamos eligiendo el próximo problema que vale la pena resolver para pequeños negocios. ¿Tienes uno que te consume el día? Esa conversación es gratis — cuéntanos.',
+      },
+      cta: {
+        title: 'Construyamos algo que te haga la vida más fácil.',
+        body: 'Cuéntanos qué te consume el día, y nos quedamos para asegurarnos de que siga resuelto.',
+        button: 'Empezar una conversación',
       },
     },
     about: {
       kicker: 'Nosotros',
-      title: 'Hacemos IA que se gana su lugar.',
-      paragraphs: [
-        'HaloBits es un pequeño estudio en Miami que crea herramientas de IA para pequeños y medianos negocios. Empezamos porque los negocios que queremos — restaurantes, salones, clínicas, negocios familiares — siguen perdiendo clientes por llamadas perdidas, mensajes sin responder y software que nunca se hizo para ellos.',
-        'Creemos que la mejor tecnología desaparece. No pide atención; en silencio te devuelve tu tiempo. Por eso creamos herramientas tranquilas y confiables, en inglés y español, y las medimos por una sola cosa: ¿se te hizo más fácil el día?',
-        'Y no vendemos y desaparecemos. Nos quedamos — observando, arreglando, mejorando — porque a un socio se le mide por lo que pasa después del lanzamiento, no antes.',
-        'Vamos despacio con el texto, rápido con los errores, y nunca lanzamos nada que no usaríamos en nuestro propio negocio.',
+      title: 'Hacemos software que se gana su lugar.',
+      essential:
+        'HaloBits es un estudio de software en Miami que crea software a medida para pequeños y medianos negocios — la capacidad que las grandes empresas siempre han tenido, ahora al alcance de quienes quedaban fuera por el precio. Lo diseñamos, lo construimos, y nos quedamos para operarlo contigo. Nuestra primera herramienta ya está en vivo, trabajando para un negocio de Miami.',
+      details: [
+        {
+          title: 'Qué hacemos.',
+          body: 'Construimos software que te quita el trabajo repetitivo y aburrido — haciéndolo más llevadero, menos notable, o incluso invisible. Trabajamos con el stack moderno, IA incluida donde de verdad se gana su lugar. Cada herramienta se hace a la medida de un negocio a la vez: lanzamos una primera versión funcional, la refinamos contigo en el mundo real, y nos quedamos después del lanzamiento en vez de vender una licencia y desaparecer.',
+        },
+        {
+          title: 'Quiénes somos.',
+          body: 'Un estudio independiente que hace todo el trabajo en casa — estrategia, software y el soporte que viene después. Trabajas directamente con las personas que construyen tu herramienta, de principio a fin.',
+        },
+        {
+          title: 'Dónde.',
+          body: 'Miami, Florida. Bilingüe por defecto, inglés y español, como hace negocios esta ciudad.',
+        },
+        {
+          title: 'Por qué existimos.',
+          body: 'El software potente siempre vino con presupuesto de empresa grande y un equipo de IT para operarlo. Los demás se las arreglaban. HaloBits pone esa capacidad al alcance de los negocios que quedaban fuera, y responde a una sola pregunta: ¿se te hizo más fácil el día?',
+        },
+        {
+          title: 'Cómo trabajamos.',
+          body: 'Mes a mes, cancela cuando quieras, sin contrato que te amarre. Mantenemos la tecnología silenciosa y confiable — de esa que olvidas que está corriendo — y cuando algo se rompe normalmente estamos en ello el mismo día.',
+        },
       ],
-      valuesTitle: 'A lo que nos atenemos',
-      values: [
+    },
+    faq: {
+      kicker: 'Preguntas',
+      title: 'Respuestas directas antes de comprometerte.',
+      items: [
         {
-          title: 'Socio, no proveedor',
-          body: 'Ganamos cuando tú ganas — y seguimos al teléfono mucho después del día del lanzamiento.',
+          q: '¿Qué tipo de software pueden construir?',
+          a: 'Una gama amplia — si funciona a base de repetición, probablemente lo podemos automatizar. Si no estás seguro de que tu problema encaje, cuéntanos cuál es — esa conversación es gratis — y te diremos sin rodeos si es algo que podemos construir.',
+          linkLabel: 'Cuéntanos tu problema →',
+          linkHref: '/contact/',
         },
         {
-          title: 'Bilingüe de nacimiento',
-          body: 'Miami es bilingüe, así que todo lo que construimos también lo es, desde el primer día.',
+          q: '¿Solo construyen para restaurantes?',
+          a: 'No. Venimos de la hostelería, así que ahí empezamos, pero construimos para cualquier negocio pequeño o mediano.',
         },
         {
-          title: 'Tecnología tranquila',
-          body: 'Confiable, silenciosa, sin estorbar. La mejor herramienta es la que olvidas que está ahí.',
+          q: 'Somos pequeños. ¿Somos demasiado pequeños para ustedes?',
+          a: 'Casi seguro que no — los pequeños son justo para quienes construimos. Preferimos ser el tamaño correcto para ti que el nombre más grande al que no puedes llamar por teléfono. Si tu problema de verdad necesita un gran proveedor empresarial, también te lo diremos.',
         },
         {
-          title: 'Honestos con el alcance',
-          body: 'Construimos lo más pequeño que lo resuelve — y te decimos la verdad sobre lo demás.',
+          q: '¿Cuánto cuesta?',
+          a: 'Empiezas pequeño — una cuota de instalación y una mensualidad, mes a mes, cancela cuando quieras. Sin contrato largo, sin amarres. Mantenemos los detalles en la página de cada herramienta, para que los números estén atados a lo que realmente recibes. Y si prefieres comprar un programa para tenerlo en propiedad, también lo hacemos.',
+          linkLabel: 'Ver nuestras herramientas →',
+          linkHref: '/what-we-build/',
+        },
+        {
+          q: '¿Qué necesitan de mí para empezar?',
+          a: 'Menos de lo que crees. Empezamos con una conversación sobre tu día y lo único que más te cuesta — sin especificación, sin documentos, sin tareas. De ahí nosotros nos encargamos de construir; solo pediremos lo que de verdad necesitemos en el camino, como acceso a una herramienta que ya usas o unos minutos para ver cómo fluye el trabajo. Tú aportas el conocimiento del negocio; nosotros, todo lo demás.',
+        },
+        {
+          q: '¿Cuánto tarda en funcionar?',
+          a: 'Más rápido de lo que esperas. Ves algo en vivo en semanas. Lanzamos una primera versión funcional pronto, la ponemos frente a tu día real, y refinamos desde ahí.',
+        },
+        {
+          q: '¿Qué pasa después del lanzamiento?',
+          a: 'Un lanzamiento es el inicio de la relación, no el final del trabajo. Nos quedamos — observando, mejorando conforme cambia tu negocio. Cuando algo se rompe, lo arreglamos lo más rápido posible.',
+        },
+        {
+          q: '¿Tengo que ser técnico?',
+          a: 'Para nada. Tú aportas el negocio; nosotros el software. Lo configuramos, lo operamos y te explicamos en lenguaje claro lo que quieras entender.',
+        },
+        {
+          q: '¿De verdad voy a hablar con una persona?',
+          a: 'Sí — las personas que construyen tu herramienta son las que te responden. Escríbenos por email o Telegram y hablas directamente con el estudio, no con una recepción ni un número de ticket.',
+        },
+        {
+          q: '¿Y si no funciona?',
+          a: 'Entonces te vas, sin resentimientos — para eso es el mes a mes. Preferimos perder un cliente limpiamente que atrapar a uno. Pero todo nuestro modelo está hecho para que eso no pase: si una herramienta no se gana su lugar, la mejoramos hasta que lo haga.',
         },
       ],
-      signoff: '— El equipo de HaloBits',
     },
     contact: {
       kicker: 'Contacto',
