@@ -35,3 +35,16 @@ Auto-deploys to Vercel on push to `main` (Astro is auto-detected; build command
 
 Each product keeps its own repo + subdomain; this site is the brand/SEO layer
 that links out to them.
+
+## Design versions
+
+- **Current ("Warm tech")** — branch `redesign`: warm black + cream, painted hero art.
+- **Previous (blue dark-glass)** — kept in git as tag `v1-old-design` (and on `main`).
+  Open it any time with `git checkout v1-old-design`, or
+  `git worktree add ../halobits-old v1-old-design` to run both side by side.
+
+Placeholder blocks (product screenshots, team photo, quotes, stats) show only in
+`npm run dev`. To preview them in a build: `PUBLIC_SHOW_PLACEHOLDERS=true npm run build`.
+
+The contact form has no backend yet: it opens a pre-filled email. Set
+`PUBLIC_CONTACT_ENDPOINT` (e.g. a Formspree URL) to POST it instead.

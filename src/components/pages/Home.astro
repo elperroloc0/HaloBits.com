@@ -1,10 +1,11 @@
 ---
-// pages/Home.astro — the homepage BODY. Composes the section components in order.
+// pages/Home.astro — the homepage BODY. Composes the section components in
+// order, with eased gradient bands wherever dark meets light.
 // The thin route files (src/pages/index.astro and src/pages/es/index.astro) just
 // render <Home lang="en" /> and <Home lang="es" />, so the page is defined once.
 import Base from '../../layouts/Base.astro';
+import Band from '../ui/Band.astro';
 import Hero from '../sections/Hero.astro';
-import Philosophy from '../sections/Philosophy.astro';
 import WhatWeBuild from '../sections/WhatWeBuild.astro';
 import HowWePartner from '../sections/HowWePartner.astro';
 import CTA from '../sections/CTA.astro';
@@ -18,12 +19,11 @@ const { lang } = Astro.props;
 const meta = content[lang].meta.home;
 ---
 
-<Base lang={lang} title={meta.title} description={meta.description}>
-  <!-- Home = pure company identity. Products live on their own sites.
-       Shipped/Concierge section is deliberately absent here. -->
+<Base lang={lang} title={meta.title} description={meta.description} current="home">
   <Hero lang={lang} />
-  <Philosophy lang={lang} />
   <WhatWeBuild lang={lang} />
+  <Band from="#14110F" to="#EFE6D6" />
   <HowWePartner lang={lang} />
+  <Band from="#EFE6D6" to="#14110F" />
   <CTA lang={lang} />
 </Base>

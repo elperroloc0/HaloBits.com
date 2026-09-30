@@ -1,317 +1,528 @@
 ---
-// pages/WhatWeBuild.astro
-//   1. Header
-//   2. LIVE NOW — Concierge AI (protagonist block, larger than everything else)
-//   3. Capabilities grid ("A few things we build well")
-//   4. On the way (small roadmap teaser)
-//   5. Closing CTA (page-specific copy via CTA props)
+// pages/WhatWeBuild.astro — one screen, not a long scroll.
+//   [ Products | Services ]            ← mode switch
+//   AI Concierge · Van Tracker · …      ← project tabs (Products only)
+//   one panel at a time
+//
+// Adding a project = one object in `buildPage.projects` (content.ts, both
+// languages) + optional screenshot at src/assets/projects/<id>.png|jpg|webp.
+// Without JavaScript every panel is simply shown one after another (the tab
+// buttons are hidden until the script below switches the page into tab mode).
+// Screenshots that don't exist yet are dev-only placeholders (lib/placeholders.ts).
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import Section from '../Section.astro';
-import CTA from '../sections/CTA.astro';
+import Button from '../ui/Button.astro';
 import { content } from '../../i18n/content';
-import type { Lang } from '../../i18n/utils';
+import { SHOW_PLACEHOLDERS } from '../../lib/placeholders';
+import { localizePath, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const c = content[lang].whatWeBuildPage;
+const t = content[lang].buildPage;
 const meta = content[lang].meta.whatWeBuild;
+const contact = localizePath('/contact/', lang);
+
+const shots = import.meta.glob<{ default: ImageMetadata }>('../../assets/projects/*.{jpg,jpeg,png,webp}', { eager: true });
+const shotFor = (id: string) => Object.entries(shots).find(([path]) => path.split('/').pop()!.startsWith(id + '.'))?.[1].default;
+const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
 ---
 
-<Base lang={lang} title={meta.title} description={meta.description}>
-  <Section tone="bg" blobs blobVariant="a">
-    <!-- 1. Header -->
-    <div class="s-head">
-      <span class="tag">{c.kicker}</span>
-      <h1>{c.title}</h1>
-    </div>
-
-    <!-- 2. LIVE NOW — Concierge (protagonist) -->
-    <div class="live card">
-      <div class="live-copy">
-        <span class="live-label"><span class="pulse"></span>{c.live.label}</span>
-        <h2>{c.live.name}</h2>
-        <p class="live-body">{c.live.body}</p>
-        <!-- Opens in a new tab → the product's own site -->
-        <a
-          href={c.live.href}
-          class="btn btn-solid"
-          target="_blank"
-          rel="noopener noreferrer">{c.live.cta} →</a
-        >
-      </div>
-
-      <!-- Product visual — CSS-built call-UI card (swap for a real screenshot
-           later by replacing this .product block with an <img>). -->
-      <div class="product" aria-hidden="true">
-        <div class="product-bar">
-          <span class="d d1"></span><span class="d"></span><span class="d"></span>
-          <span class="product-title">Concierge</span>
-        </div>
-        <div class="product-body">
-          <div class="prow">
-            <span class="livedot"></span>
-            <span class="prow-txt">On a call</span>
-            <span class="lang-chip">EN · ES</span>
-          </div>
-          <div class="wave">
-            <span style="--h:40%"></span><span style="--h:72%"></span>
-            <span style="--h:100%"></span><span style="--h:55%"></span>
-            <span style="--h:84%"></span><span style="--h:36%"></span>
-            <span style="--h:66%"></span><span style="--h:94%"></span>
-            <span style="--h:48%"></span><span style="--h:76%"></span>
-            <span style="--h:30%"></span><span style="--h:60%"></span>
-          </div>
-          <div class="sk"><span class="l w90"></span><span class="l w70"></span></div>
-          <div class="chips">
-            <span class="chip">✓ Booking confirmed</span>
-            <span class="chip">✓ Guest remembered</span>
-          </div>
+<Base lang={lang} title={meta.title} description={meta.description} current="build" flow>
+  <section class="head">
+    <div class="wrap">
+      <h1 class="display">{t.title}</h1>
+      <div class="head-row">
+        <p class="lead">{t.lead}</p>
+        <!-- Mode switch: Products | Services (the script turns it on) -->
+        <div class="modes" role="group" aria-label={t.modeLabel} data-js hidden>
+          <button type="button" data-mode="products" aria-pressed="true">{t.products}</button>
+          <button type="button" data-mode="services" aria-pressed="false">{t.services}</button>
         </div>
       </div>
     </div>
-  </Section>
+  </section>
 
-  <!-- 3. Capabilities -->
-  <Section tone="surface" blobs blobVariant="b">
-    <div class="s-head">
-      <span class="tag">{c.capKicker}</span>
-      <h2>{c.capTitle}</h2>
-      <p class="lead">{c.capLead}</p>
-    </div>
-    <div class="cap-grid">
-      {
-        c.capabilities.map((cap) => (
-          <div class="cap paper">
-            <h3>{cap.title}</h3>
-            <p>{cap.body}</p>
-          </div>
-        ))
-      }
-    </div>
-  </Section>
+  <section class="stage" id="stage">
+    <div class="wrap">
+      <!-- ───── Products ───── -->
+      <div class="mode-panel" data-panel="products">
+        <div class="tabs" role="tablist" aria-label={t.projectsLabel} data-js hidden>
+          {
+            t.projects.map((p, i) => (
+              <button type="button" role="tab" class="tab" id={`tab-${p.id}`} data-project={p.id} aria-controls={p.id} aria-selected={i === 0 ? 'true' : 'false'}>
+                {p.name}
+              </button>
+            ))
+          }
+        </div>
 
-  <!-- 4. On the way -->
-  <Section tone="bg" blobs blobVariant="c">
-    <div class="next">
-      <span class="tag">{c.next.kicker}</span>
-      <h2>{c.next.title}</h2>
-      <p class="lead">{c.next.body}</p>
-    </div>
-  </Section>
+        {
+          t.projects.map((p) => {
+            const img = shotFor(p.id);
+            const showMedia = img || SHOW_PLACEHOLDERS;
+            return (
+              <article class="project" id={p.id} role="tabpanel" aria-labelledby={`tab-${p.id}`} data-project-panel={p.id}>
+                <div class="copy">
+                  <p class="meta">
+                    <span class="for">{p.for}</span>
+                  </p>
+                  <h2 class="display name">{p.name}</h2>
+                  <p class="desc">{p.desc}</p>
 
-  <!-- 5. Closing CTA -->
-  <CTA lang={lang} title={c.cta.title} body={c.cta.body} button={c.cta.button} />
+                  {p.includes && (
+                    <div class="block">
+                      <p class="eyebrow label">{t.includes}</p>
+                      <ul class="includes">
+                        {p.includes.map((i) => (
+                          <li>
+                            <span class="bullet" aria-hidden="true" />
+                            {i}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div class="block">
+                    <p class="eyebrow label">{t.who}</p>
+                    <p class="who">{p.who}</p>
+                  </div>
+
+                  <Button href={href(p.cta.href)} external={p.cta.external} variant={p.cta.external ? 'cream' : 'outline'} class="cta">
+                    {p.cta.label}
+                  </Button>
+                </div>
+
+                {(showMedia || p.stats) && (
+                  <div class={`side side--${p.media.shape}`}>
+                    {showMedia && (
+                      <figure class={`media media--${p.media.shape}`}>
+                        {img ? (
+                          <Image src={img} alt={p.media.alt} widths={[480, 960, 1400]} sizes="(min-width: 1000px) 50vw, 100vw" loading="lazy" />
+                        ) : (
+                          <div class="ph" role="img" aria-label={p.media.ph}>
+                            <span>{p.media.ph}</span>
+                          </div>
+                        )}
+                      </figure>
+                    )}
+                    {p.stats && p.statsCaption && <p class="eyebrow stats-caption">{p.statsCaption}</p>}
+                    {p.stats && (
+                      <dl class="stats">
+                        {p.stats.map((s) => (
+                          <div class="stat">
+                            <dt>{s.v}</dt>
+                            <dd>{s.l}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    )}
+                  </div>
+                )}
+              </article>
+            );
+          })
+        }
+      </div>
+
+      <!-- ───── Services ───── -->
+      <div class="mode-panel" data-panel="services" id="services">
+        <ul class="services">
+          {
+            t.servicesPanel.items.map((s) => (
+              <li class="service">
+                <h2>{s.t}</h2>
+                <div class="service-body">
+                  <p>{s.b}</p>
+                  {s.from && (
+                    <p class="from">
+                      {t.servicesPanel.fromLabel} <strong>{s.from}</strong>
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="services-foot">
+          <p class="services-lead">{t.servicesPanel.lead}</p>
+          <Button href={contact} class="cta-services">{t.servicesPanel.cta}</Button>
+        </div>
+      </div>
+    </div>
+  </section>
 </Base>
 
 <style>
-  .s-head {
-    max-width: 720px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  /* ── header ── */
+  .head {
+    padding: clamp(40px, 5vw, 72px) 0 0;
   }
-  .s-head .tag {
-    align-self: flex-start;
+  .head h1 {
+    font-size: clamp(2.4rem, 5.4vw, 5rem);
+    max-width: 18ch;
   }
-  .s-head h1 {
-    font-size: clamp(2.6rem, 6vw, 4.6rem);
-    max-width: 16ch;
-  }
-
-  /* ── LIVE block — the page protagonist ─────────────────────────── */
-  .live {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: center;
-    padding: clamp(2rem, 4vw, 3.5rem);
-  }
-  .live-copy {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 18px;
-  }
-  .live-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: #4ec98a;
-  }
-  .pulse {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #22a06b;
-    box-shadow: 0 0 0 4px rgba(34, 160, 107, 0.16);
-  }
-  .live h2 {
-    font-size: clamp(2rem, 3.5vw, 3rem);
-  }
-  .live-body {
-    color: var(--muted);
-    font-size: 1.05rem;
-    line-height: 1.6;
-    max-width: 42ch;
-  }
-
-  /* ── Product card (CSS mockup) ─────────────────────────────────── */
-  .product {
-    background: rgba(12, 11, 10, 0.55);
-    border: 1px solid var(--line-2);
-    border-radius: var(--r);
-    overflow: hidden;
-    box-shadow: var(--shadow-card);
-    width: 100%;
-    max-width: 420px;
-    justify-self: end;
-  }
-  .product-bar {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 13px 18px;
-    border-bottom: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.02);
-  }
-  .d {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--line-2);
-  }
-  .d1 {
-    background: rgba(31, 63, 195, 0.6);
-  }
-  .product-title {
-    margin-left: 8px;
-    font-size: 11px;
-    letter-spacing: 0.03em;
-    color: var(--muted-2);
-  }
-  .product-body {
-    padding: 20px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .prow {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .livedot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: #22a06b;
-    box-shadow: 0 0 0 4px rgba(34, 160, 107, 0.16);
-  }
-  .prow-txt {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--fg);
-  }
-  .lang-chip {
-    margin-left: auto;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: #9fb4ff;
-    background: rgba(31, 63, 195, 0.18);
-    border: 1px solid rgba(31, 63, 195, 0.3);
-    padding: 4px 10px;
-    border-radius: var(--pill);
-  }
-  .wave {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    height: 54px;
-  }
-  .wave span {
-    flex: 1;
-    height: var(--h);
-    background: linear-gradient(var(--accent-light), var(--accent));
-    border-radius: var(--pill);
-    opacity: 0.9;
-  }
-  .sk {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-  }
-  .l {
-    height: 9px;
-    border-radius: var(--pill);
-    background: var(--line-2);
-  }
-  .w90 {
-    width: 90%;
-  }
-  .w70 {
-    width: 70%;
-  }
-  .chips {
+  .head-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px 48px;
+    margin-top: clamp(20px, 2.4vw, 32px);
   }
-  .chip {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--line);
-    padding: 7px 12px;
-    border-radius: var(--pill);
+  .lead {
+    max-width: 34rem;
+    font-size: clamp(17px, 1.35vw, 19px);
+    line-height: 1.55;
+    color: var(--soft);
+    text-wrap: pretty;
   }
 
-  /* ── Capabilities grid ─────────────────────────────────────────── */
-  .cap-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-    gap: 16px;
+  .stage {
+    padding: 0 0 clamp(96px, 12vw, 180px);
+    scroll-margin-top: 80px;
   }
-  .cap {
-    padding: 26px 24px;
+
+  /* ── mode switch (segmented pill) ── */
+  .modes {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid rgba(239, 230, 214, 0.3);
   }
-  .cap h3 {
+  .modes[hidden] {
+    display: none;
+  }
+  .modes button {
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 999px;
+    border: 0;
+    background: transparent;
+    color: var(--cream);
+    font: inherit;
+    font-size: 15px;
     font-weight: 600;
-    color: var(--fg);
-    margin-bottom: 10px;
+    cursor: var(--cursor-hand);
+    transition: background 0.2s, color 0.2s;
   }
-  .cap p {
+  .modes button[aria-pressed='true'] {
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  /* ── project tabs ── */
+  .tabs {
+    display: flex;
+    gap: clamp(22px, 3.4vw, 44px);
+    margin-top: clamp(24px, 3vw, 40px);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .tabs[hidden] {
+    display: none;
+  }
+  .tab {
+    flex: 0 0 auto;
+    position: relative;
+    padding: 12px 0 14px;
+    border: 0;
+    background: none;
+    cursor: var(--cursor-hand);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 2.4vw, 2rem);
+    letter-spacing: -0.03em;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .tab:hover,
+  .tab[aria-selected='true'] {
+    color: var(--cream);
+  }
+  .tab::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--butter);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s var(--ease);
+  }
+  .tab[aria-selected='true']::after {
+    transform: scaleX(1);
+  }
+
+  /* ── a project panel ── */
+  .project {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 48px clamp(40px, 6vw, 100px);
+    margin-top: clamp(28px, 3.4vw, 52px);
+  }
+  .project[hidden],
+  .mode-panel[hidden] {
+    display: none;
+  }
+  .copy {
+    flex: 5 1 340px;
+    max-width: 36rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
     font-size: 14px;
+    font-weight: 500;
+  }
+  .for {
+    color: var(--apricot);
+  }
+  .name {
+    margin-top: 12px;
+    font-size: clamp(2.6rem, 5vw, 4.6rem);
+  }
+  .desc {
+    margin-top: 22px;
+    font-size: clamp(18px, 1.6vw, 21px);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  /* number with its label underneath, both flush with the right edge of the picture */
+  .stats-caption {
+    margin-top: 28px;
+    text-align: right;
+    color: var(--apricot);
+  }
+  .stats {
+    margin: 12px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 20px 40px;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 10px;
+  }
+  .stat dt {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(3rem, 5vw, 4.4rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--butter);
+  }
+  .stat dd {
+    margin: 0;
+    max-width: 16rem;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--soft);
+  }
+  .block {
+    margin-top: 28px;
+  }
+  .label {
+    color: var(--muted);
+  }
+  .who {
+    margin-top: 10px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--soft);
+  }
+  .includes {
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .includes li {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .bullet {
+    flex: 0 0 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1.5px solid var(--apricot);
+    transform: translateY(-2px);
+  }
+  :global(.btn.cta) {
+    margin-top: 32px;
+  }
+
+  /* right-hand column: screenshot (or dev placeholder) with the stats under it */
+  .side {
+    flex: 6 1 420px;
+    min-width: 0;
+  }
+  .side--phone {
+    flex: 0 1 320px;
+    margin: 0 auto;
+  }
+  .media {
+    min-width: 0;
+  }
+  .media :global(img),
+  .ph {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  /* Real screenshots keep their own proportions (nothing cropped); only the
+     dev placeholders get a fixed frame. */
+  .media--wide .ph {
+    aspect-ratio: 16 / 9;
+  }
+  .media--standard .ph {
+    aspect-ratio: 4 / 3;
+  }
+  .media--phone :global(img),
+  .media--phone .ph {
+    aspect-ratio: 852 / 1846; /* our Van Tracker screenshot's ratio, nothing is cropped */
+    border-radius: 36px;
+    object-fit: cover;
+    object-position: top;
+  }
+  .ph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    background: var(--ink-soft) repeating-linear-gradient(135deg, rgba(239, 230, 214, 0.05) 0 1px, transparent 1px 12px);
+  }
+  .ph span {
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--muted);
     line-height: 1.6;
   }
 
-  /* ── On the way ────────────────────────────────────────────────── */
-  .next {
-    max-width: 560px;
+  /* ── services ── */
+  .mode-panel + .mode-panel {
+    margin-top: clamp(72px, 9vw, 130px); /* only visible in the no-JS stacked layout */
+  }
+  .services {
+    margin: clamp(28px, 3.4vw, 52px) 0 0;
+    padding: 0;
+    list-style: none;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
+    gap: clamp(32px, 4vw, 52px);
   }
-  .next .lead {
+  .service {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px clamp(32px, 6vw, 96px);
+  }
+  .service h2 {
+    flex: 0 1 340px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+  .service-body {
+    flex: 1 1 340px;
+    max-width: 38rem;
+  }
+  .service-body p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--soft);
+    text-wrap: pretty;
+  }
+  .service-body .from {
+    margin-top: 10px;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: var(--apricot);
+  }
+  .service-body .from strong {
+    font-weight: 600;
+  }
+  .services-foot {
+    margin-top: clamp(48px, 6vw, 88px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px 32px;
+  }
+  .services-lead {
+    max-width: 30rem;
+    font-size: 17px;
+    line-height: 1.55;
     color: var(--muted);
   }
-
-  @media (max-width: 820px) {
-    .live {
-      grid-template-columns: 1fr;
-    }
-    .product {
-      justify-self: start;
-    }
-  }
 </style>
+
+<script>
+  // Turns the stacked page into tab mode and keeps the URL hash in sync, so old
+  // links like /what-we-build/#van (and #custom → Services) still land correctly.
+  const root = document.querySelector('main');
+  if (root) {
+    const modeBtns = root.querySelectorAll<HTMLButtonElement>('[data-mode]');
+    const modePanels = root.querySelectorAll<HTMLElement>('[data-panel]');
+    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-project]');
+    const projects = root.querySelectorAll<HTMLElement>('[data-project-panel]');
+    const firstProject = projects[0]?.dataset.projectPanel ?? '';
+
+    root.querySelectorAll<HTMLElement>('[data-js]').forEach((el) => (el.hidden = false));
+
+    const show = (mode: 'products' | 'services', project = firstProject, updateHash = true) => {
+      modeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+      modePanels.forEach((p) => (p.hidden = p.dataset.panel !== mode));
+      tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.project === project)));
+      projects.forEach((p) => (p.hidden = p.dataset.projectPanel !== project));
+      if (updateHash) history.replaceState(null, '', mode === 'services' ? '#services' : `#${project}`);
+    };
+
+    const fromHash = () => {
+      const h = decodeURIComponent(location.hash.slice(1));
+      if (h === 'services' || h === 'custom') return show('services', firstProject, false);
+      const known = [...projects].some((p) => p.dataset.projectPanel === h);
+      show('products', known ? h : firstProject, false);
+    };
+
+    modeBtns.forEach((b) => b.addEventListener('click', () => show(b.dataset.mode as 'products' | 'services')));
+    tabs.forEach((b) => b.addEventListener('click', () => show('products', b.dataset.project)));
+
+    // Arrow keys move between tabs (standard tablist behaviour).
+    root.querySelector('[role="tablist"]')?.addEventListener('keydown', (e) => {
+      const ev = e as KeyboardEvent;
+      if (ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
+      const list = [...tabs];
+      const i = list.findIndex((b) => b.getAttribute('aria-selected') === 'true');
+      const next = list[(i + (ev.key === 'ArrowRight' ? 1 : list.length - 1)) % list.length];
+      next.focus();
+      next.click();
+    });
+
+    window.addEventListener('hashchange', fromHash);
+    fromHash();
+  }
+</script>

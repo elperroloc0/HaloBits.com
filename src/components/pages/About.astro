@@ -1,97 +1,348 @@
 ---
-// pages/About.astro — studio story. Essential intro + detail blocks.
-// "Three steps" (HowWePartner) deliberately NOT here — it lives only on home.
+// pages/About.astro — studio story.
+// Painted hero (fades into cream) → lead statement + definition list (cream) →
+// band → dark "small team" section with a photo slot, two quote slots and CTAs.
+// The photo and quotes are placeholders (dev-only); when real ones exist, drop
+// them into the marked spots and flip SHOW_PLACEHOLDERS' gate off for them.
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import Section from '../Section.astro';
-import CTA from '../sections/CTA.astro';
+import Band from '../ui/Band.astro';
+import Button from '../ui/Button.astro';
+import Fade from '../ui/Fade.astro';
+import hill from '../../assets/miami-hill.jpg';
+
 import { content } from '../../i18n/content';
-import type { Lang } from '../../i18n/utils';
+import { SHOW_PLACEHOLDERS } from '../../lib/placeholders';
+import { localizePath, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const c = content[lang].about;
+
+// Switches for parts we're not ready to show yet. Markup and copy stay in place;
+// flip a flag to true to bring that part back, nothing else needs to change.
+const SHOW_TEAM_INTRO = true; // "A small team. You talk to the people who build it." + text
+const SHOW_TEAM_PHOTO = false; // group photo next to that text (no photo yet)
+const SHOW_QUOTES = false; // client testimonials (no real quotes yet)
+const t = content[lang].about;
 const meta = content[lang].meta.about;
+
+// Portraits are picked up by file name: src/assets/people/<slug>.jpg|png|webp
+// (slug = name in lowercase with dashes, e.g. angel-garcia.jpg). Missing file →
+// the card shows initials instead, so the build never breaks.
+const portraits = import.meta.glob<{ default: ImageMetadata }>('../../assets/people/*.{jpg,jpeg,png,webp}', { eager: true });
+const portraitFor = (name: string) => {
+  const slug = name.toLowerCase().replace(/\s+/g, '-');
+  const hit = Object.entries(portraits).find(([path]) => path.split('/').pop()!.startsWith(slug + '.'));
+  return hit?.[1].default;
+};
+const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 ---
 
-<Base lang={lang} title={meta.title} description={meta.description}>
-  <Section tone="bg" blobs blobVariant="a">
-    <div class="s-head">
-      <span class="tag">{c.kicker}</span>
-      <h1>{c.title}</h1>
+<Base lang={lang} title={meta.title} description={meta.description} current="about">
+  <!-- 01 · Header -->
+  <section class="hero">
+    <Image
+      src={hill}
+      alt={t.alt}
+      class="bg"
+      widths={[800, 1280, 1672]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="scrim" aria-hidden="true"></div>
+    <Fade color="#EFE6D6" height="36%" />
+    <div class="wrap hero-in">
+      <h1 class="display">{t.title}</h1>
     </div>
+  </section>
 
-    <!-- Lo esencial — the one paragraph that captures the studio -->
-    <p class="essential">{c.essential}</p>
+  <!-- 02 · The studio -->
+  <section class="studio">
+    <div class="wrap">
+      <p class="essential">{t.essential}</p>
+      <dl class="details">
+        {
+          t.details.map((d) => (
+            <div class="detail">
+              <dt>{d.t}</dt>
+              <dd>{d.b}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
 
-    <!-- Los detalles — labelled blocks (What we do / Who we are / …) -->
-    <div class="details">
+  <Band from="#EFE6D6" to="#14110F" />
+
+  <!-- 03 · Team -->
+  <section class="team">
+    <div class="wrap">
       {
-        c.details.map((d) => (
-          <div class="detail">
-            <h3 class="detail-title">{d.title}</h3>
-            <p class="detail-body">{d.body}</p>
+        SHOW_TEAM_INTRO && (
+          <div class="team-row">
+            {
+              SHOW_TEAM_PHOTO && SHOW_PLACEHOLDERS && (
+                <div class="photo" role="img" aria-label={t.team.ph}>
+                  <span>{t.team.ph}</span>
+                </div>
+              )
+            }
+            <div class="team-copy">
+              <h2>{t.team.title}</h2>
+            </div>
           </div>
-        ))
+        )
       }
+
+      <ul class="people">
+        {
+          t.people.map((person) => {
+            const img = portraitFor(person.name);
+            return (
+              <li class="person">
+                {img ? (
+                  <Image src={img} alt={person.photoAlt} class="portrait" widths={[360, 720]} sizes="(min-width: 700px) 360px, 70vw" loading="lazy" />
+                ) : (
+                  <div class="portrait portrait--initials" aria-hidden="true">
+                    <span>{initials(person.name)}</span>
+                  </div>
+                )}
+                <p class="p-name">{person.name}</p>
+                <p class="p-role">{person.role}</p>
+              </li>
+            );
+          })
+        }
+      </ul>
+
+      {
+        SHOW_QUOTES && SHOW_PLACEHOLDERS && (
+          <div class="quotes">
+            <figure class="quote">
+              <blockquote>“{t.team.q}”</blockquote>
+              <figcaption>{t.team.qn}</figcaption>
+            </figure>
+            <figure class="quote quote--low">
+              <blockquote>“{t.team.q2}”</blockquote>
+              <figcaption>{t.team.qn}</figcaption>
+            </figure>
+          </div>
+        )
+      }
+
+      <div class="actions">
+        <Button href={localizePath('/contact/', lang)} size="lg" track="cta_talk_about">{t.cta}</Button>
+        <Button href={localizePath('/what-we-build/', lang)} size="lg" variant="outline" track="cta_build_about">{t.cta2}</Button>
+      </div>
     </div>
-
-    <!-- FOUNDER DROP-IN ───────────────────────────────────────────────
-         When ready, replace this block with the founder's name, photo and a
-         one-liner (e.g. "— Name, founder, Miami."). It's the biggest trust
-         jump on the page. Nothing else needs to change. -->
-    {/* <div class="founder"> … </div> */}
-  </Section>
-
-  <CTA lang={lang} />
+  </section>
 </Base>
 
 <style>
-  .s-head {
-    margin-bottom: 32px;
+  .hero {
+    position: relative;
+    min-height: clamp(560px, 82vh, 860px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
-  .s-head .tag {
-    margin-bottom: 18px;
+  .bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: 40% 70%;
   }
-  .s-head h1 {
-    font-size: clamp(2.6rem, 6vw, 4.6rem);
-    max-width: 16ch;
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(20, 17, 15, 0.62) 0%,
+      rgba(20, 17, 15, 0.3) 36%,
+      rgba(20, 17, 15, 0) 64%
+    );
   }
-  /* The essential paragraph reads larger — it's the lede */
+  .hero-in {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding-top: clamp(128px, 18vh, 200px);
+  }
+  .hero h1 {
+    font-size: clamp(2.8rem, 7vw, 6.8rem);
+    max-width: 12ch;
+  }
+
+  .studio {
+    background: var(--cream);
+    color: var(--ink);
+    padding: clamp(40px, 6vw, 100px) 0 clamp(40px, 6vw, 90px);
+  }
   .essential {
-    max-width: var(--maxw-prose);
-    font-size: clamp(1.15rem, 2vw, 1.5rem);
-    line-height: 1.5;
-    font-weight: 300;
-    color: var(--fg);
-    margin-bottom: clamp(3rem, 6vw, 4.5rem);
+    max-width: 46rem;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 2.6vw, 2.3rem);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    text-wrap: pretty;
   }
-  /* Detail blocks in two columns on wide screens */
   .details {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 36px 48px;
-    max-width: 980px;
-    border-top: 1px solid var(--line);
-    padding-top: clamp(2.5rem, 5vw, 3.5rem);
+    margin-top: clamp(72px, 9vw, 130px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(40px, 5vw, 64px);
   }
-  .detail-title {
-    font-weight: 600;
-    font-size: 1.05rem;
-    color: var(--fg);
-    margin-bottom: 10px;
+  .detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px clamp(32px, 6vw, 96px);
   }
-  .detail-body {
-    font-size: 15px;
+  dt {
+    flex: 0 1 280px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2vw, 1.8rem);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  dd {
+    flex: 1 1 360px;
+    max-width: 38rem;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text-on-cream);
+    text-wrap: pretty;
+  }
+
+  .team {
+    padding: clamp(30px, 5vw, 80px) 0 clamp(96px, 12vw, 180px);
+  }
+  .team-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 40px clamp(32px, 5vw, 80px);
+  }
+  .photo {
+    flex: 6 1 440px;
+    aspect-ratio: 4 / 3;
+    border-radius: 4px;
+    background: var(--ink-soft) repeating-linear-gradient(135deg, rgba(239, 230, 214, 0.05) 0 1px, transparent 1px 12px);
+    display: flex;
+    align-items: flex-end;
+    padding: 18px;
+  }
+  .photo span {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--muted);
-    line-height: 1.7;
-    max-width: 46ch;
+    line-height: 1.5;
   }
-  @media (max-width: 720px) {
-    .details {
-      grid-template-columns: 1fr;
-      gap: 28px;
-    }
+  .team-copy {
+    flex: 5 1 320px;
+    max-width: 32rem;
+  }
+  .team-copy h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.9rem, 3.3vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .people {
+    margin: clamp(40px, 5vw, 64px) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 260px));
+    gap: 40px clamp(24px, 4vw, 56px);
+  }
+  .portrait {
+    width: clamp(160px, 18vw, 220px);
+    height: auto; /* the <img> carries a height attribute that would otherwise beat aspect-ratio */
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 50% 28%; /* keep the face centred in the circle */
+    border-radius: 50%;
+    background: var(--ink-soft);
+  }
+  .portrait--initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink-soft) repeating-linear-gradient(135deg, rgba(239, 230, 214, 0.05) 0 1px, transparent 1px 12px);
+  }
+  .portrait--initials span {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 3.4rem;
+    letter-spacing: -0.04em;
+    color: var(--muted);
+  }
+  .p-name {
+    margin-top: 16px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+  }
+  .p-role {
+    margin-top: 4px;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: var(--apricot);
+  }
+  .quotes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 56px clamp(40px, 8vw, 140px);
+    margin-top: clamp(88px, 10vw, 150px);
+    padding-left: clamp(0px, 6vw, 110px);
+  }
+  .quote {
+    flex: 1 1 320px;
+    max-width: 34rem;
+  }
+  .quote--low {
+    margin-top: clamp(0px, 8vw, 120px);
+  }
+  blockquote {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--muted);
+  }
+  figcaption {
+    margin-top: 18px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 26px;
+    margin-top: clamp(88px, 10vw, 150px);
+  }
+  /* no photo (production): the copy is the only child, so don't bottom-align */
+  .team-row:has(> .team-copy:only-child) {
+    align-items: flex-start;
+  }
+  .team-copy {
+    max-width: 40rem;
   }
 </style>

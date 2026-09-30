@@ -1,0 +1,14 @@
+---
+// Band.astro — the eased gradient strip that melts one flat section into the
+// next (the design forbids hard dark↔cream edges). `from` is the colour of the
+// section ABOVE, `to` the one BELOW. See lib/gradients.ts for the maths.
+import { bandGradient } from '../../lib/gradients';
+
+interface Props {
+  from: string;
+  to: string;
+}
+const { from, to } = Astro.props;
+---
+
+<div class="band" aria-hidden="true" style={`background:${bandGradient(from, to)}`}></div>

@@ -1,132 +1,102 @@
 ---
-// Footer.astro — localized site footer. Year is computed at build time.
+// Footer.astro — plain warm-black footer with a touch of film grain. No image:
+// the eased gradient band above each page melts into this colour. No tagline,
+// no language switch, no product URL here.
 import { localizePath, useTranslations, type Lang } from '../i18n/utils';
+import { SITE, telHref } from '../lib/site';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+
+const links = [
+  { to: '/what-we-build/', label: t.nav.whatWeBuild },
+  { to: '/about/', label: t.nav.about },
+  { to: '/faq/', label: t.nav.faq },
+  { to: '/contact/', label: t.nav.contact },
+];
 const year = new Date().getFullYear();
 ---
 
-<!-- Footer matches the dark design (#080807) — a soft blue ambient blob
-     sits above the content for depth, same technique as the rest of the page. -->
 <footer class="foot">
-  <div class="container foot-inner">
-    <div class="foot-brand">
-      <span class="brand-mark">✦</span>
-      <span class="brand-name">HaloBits</span>
-      <span class="tagline">{t.footer.tagline}</span>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="inner">
+    <!-- One horizontal line: wordmark · page links · contact. Wraps on phones. -->
+    <div class="row">
+      <p class="mark">HaloBits</p>
+      <nav class="col links" aria-label={t.nav.label}>
+        {links.map((l) => <a href={localizePath(l.to, lang)}>{l.label}</a>)}
+      </nav>
+      <div class="col contact">
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        <a href={telHref}>{SITE.phoneDisplay}</a>
+      </div>
     </div>
-    <div class="foot-links">
-      <a href={localizePath('/what-we-build/', lang)}>{t.nav.whatWeBuild}</a>
-      <a href={localizePath('/about/', lang)}>{t.nav.about}</a>
-      <a href={localizePath('/faq/', lang)}>{t.nav.faq}</a>
-      <a href={localizePath('/contact/', lang)}>{t.nav.contact}</a>
+    <div class="legal">
+      <span>© {year} {t.footer.rights}</span>
     </div>
-    <div class="foot-copy">© {year} HaloBits · {t.footer.location}</div>
   </div>
 </footer>
 
 <style>
   .foot {
-    margin-top: 0;
-    /* Many stops = smooth ease-in curve (CSS can't do easing natively).
-       Lots of steps at the top where the blue-to-dark change is most visible.
-       Extra padding-top gives the gradient room to breathe before the content. */
-    background: linear-gradient(
-      to bottom,
-      #1f3fc3  0%,
-      #1d3bba  6%,
-      #1a34a8 12%,
-      #162a8a 20%,
-      #121f68 29%,
-      #0e1648 39%,
-      #0a0f2e 50%,
-      #080a1a 62%,
-      #080807 76%,
-      #080807 100%
-    );
-    padding: 120px clamp(1.5rem, 5vw, 2.5rem) 36px;
     position: relative;
+    background: var(--ink);
+    color: var(--cream);
     overflow: hidden;
   }
-  /* Subtle ambient blue blob at the top of the footer */
-  .foot::before {
-    content: '';
+  .grain {
     position: absolute;
-    width: 500px;
-    height: 300px;
-    left: 50%;
-    transform: translateX(-50%);
-    top: -80px;
-    background: radial-gradient(circle, oklch(0.64 0.12 258 / 0.12), transparent 70%);
-    filter: blur(70px);
-    pointer-events: none;
-    z-index: 0;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 200px 200px;
+    opacity: 0.32;
+    mix-blend-mode: overlay;
   }
-  .foot-inner {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 24px;
-    align-items: center;
+  .inner {
     position: relative;
-    z-index: 1;
-    padding-bottom: 28px;
-    border-bottom: 1px solid rgba(240, 235, 229, 0.07);
+    z-index: 2;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: clamp(56px, 6vw, 88px) var(--gutter) 28px;
   }
-  .foot-brand {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
+  .mark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(34px, 4vw, 48px);
+    letter-spacing: -0.04em;
+    line-height: 1;
   }
-  .brand-mark {
-    color: var(--pw); /* blue-purple from the design, matches brand */
-    font-size: 18px;
-  }
-  .brand-name {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: -0.03em;
-    color: #f0ebe5; /* light on dark */
-  }
-  .tagline {
-    font-size: 13px;
-    font-style: italic;
-    color: rgba(240, 235, 229, 0.28);
-    margin-left: 10px;
-  }
-  .foot-links {
+  .row {
     display: flex;
-    gap: 22px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px clamp(32px, 5vw, 80px);
   }
-  .foot-links a {
-    font-size: 14px;
-    color: rgba(240, 235, 229, 0.50);
+  .col {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 clamp(20px, 2.4vw, 36px);
+    font-size: 15px;
+  }
+  .col a {
     text-decoration: none;
-    transition: color 0.15s;
+    padding: 12px 0;
   }
-  .foot-links a:hover {
-    color: #f0ebe5;
-  }
-  .foot-copy {
+  .legal {
+    margin-top: clamp(40px, 5vw, 72px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
     font-size: 12px;
-    color: rgba(240, 235, 229, 0.28);
-    font-family: 'Geist Mono', 'Geist', monospace;
-    position: relative;
-    z-index: 1;
-    padding-top: 20px;
-  }
-  @media (max-width: 720px) {
-    .foot-inner {
-      grid-template-columns: 1fr;
-    }
-    .tagline {
-      margin-left: 0;
-      flex-basis: 100%;
-    }
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
 </style>

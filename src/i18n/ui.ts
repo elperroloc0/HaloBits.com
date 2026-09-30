@@ -20,17 +20,20 @@ export const defaultLang: Lang = 'en';
 // The shape every language's chrome strings must satisfy.
 export interface Ui {
   nav: {
+    /** aria-label for the <nav> landmark */
+    label: string;
+    home: string;
     whatWeBuild: string;
     about: string;
     faq: string;
     contact: string;
+    talk: string;
+    menu: string;
+    close: string;
   };
-  langSwitch: {
-    /** aria-label for the switcher */
-    label: string;
-  };
+  /** aria-label for the EN / ES switcher */
+  langLabel: string;
   footer: {
-    tagline: string;
     location: string;
     rights: string;
   };
@@ -38,26 +41,33 @@ export interface Ui {
 
 export const ui: Record<Lang, Ui> = {
   en: {
-    nav: { whatWeBuild: 'What we build', about: 'About', faq: 'FAQ', contact: 'Contact' },
-    langSwitch: { label: 'Change language' },
-    footer: {
-      tagline: 'Not a service. A partner.',
-      location: 'Miami, FL',
-      rights: 'All rights reserved.',
+    nav: {
+      label: 'Main',
+      home: 'Home',
+      whatWeBuild: 'What we build',
+      about: 'About',
+      faq: 'FAQ',
+      contact: 'Contact',
+      talk: "Let's talk",
+      menu: 'Menu',
+      close: 'Close',
     },
+    langLabel: 'Language',
+    footer: { location: 'Miami, FL', rights: 'HaloBits LLC' },
   },
   es: {
     nav: {
-      whatWeBuild: 'Qué construimos',
+      label: 'Principal',
+      home: 'Inicio',
+      whatWeBuild: 'Qué hacemos',
       about: 'Nosotros',
       faq: 'Preguntas',
       contact: 'Contacto',
+      talk: 'Hablemos',
+      menu: 'Menú',
+      close: 'Cerrar',
     },
-    langSwitch: { label: 'Cambiar idioma' },
-    footer: {
-      tagline: 'No es un servicio. Es un socio.',
-      location: 'Miami, FL',
-      rights: 'Todos los derechos reservados.',
-    },
+    langLabel: 'Idioma',
+    footer: { location: 'Miami, FL', rights: 'HaloBits LLC' },
   },
 };

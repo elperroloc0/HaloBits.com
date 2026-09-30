@@ -24,3 +24,6 @@ pnpm-debug.log*
 # --- OS / editor cruft ---
 .DS_Store
 .idea/
+
+
+missing-design-images

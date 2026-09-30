@@ -1,28 +1,69 @@
 ---
-// Base.astro — HTML shell with:
-//   • #grain   — fixed noise overlay (mix-blend-mode:overlay) for the grainy
-//                texture on gradient blobs across the whole page
-//   • .glass   — fixed frosted-glass layer (backdrop-filter:blur) between
-//                the hero background orbs (z-index:0-5) and the page content
-//                (z-index:20). Stays fixed as the user scrolls.
-import Nav from '../components/Nav.astro';
+// Base.astro — HTML shell shared by every page: <head> (SEO, fonts), film grain
+// overlay, Nav, <main> (the page's <slot/>), Footer, and the scroll-reveal
+// script. Pages pass `current`/`tone`/`flow` through to the Nav (see Nav.astro).
+import Nav, { type NavKey } from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { ClientRouter } from 'astro:transitions';
+import Analytics from '@vercel/analytics/astro';
 import { getAlternateUrls, type Lang } from '../i18n/utils';
+import { SITE } from '../lib/site';
 import '../styles/global.css';
 
 interface Props {
   lang: Lang;
   title: string;
   description?: string;
+  current?: NavKey;
+  tone?: 'dark' | 'light';
+  flow?: boolean;
+  /** Background of the page behind <main>; FAQ is cream, everything else dark. */
+  theme?: 'dark' | 'light';
+  /** Keep the page out of search results (404). */
+  noindex?: boolean;
 }
-const { lang, title, description = 'HaloBits — not a service, a partner.' } = Astro.props;
+const {
+  lang,
+  title,
+  description = 'HaloBits — not a service, a partner.',
+  current,
+  tone = 'dark',
+  flow = false,
+  theme = 'dark',
+  noindex = false,
+} = Astro.props;
 
 const alt = getAlternateUrls(Astro.url);
 const canonicalURL = new URL(alt[lang], Astro.site);
 const enURL = new URL(alt.en, Astro.site);
 const esURL = new URL(alt.es, Astro.site);
-const ogImage = new URL('/og.png', Astro.site);
+// One share image per language (1200×630) so the WhatsApp/iMessage/LinkedIn
+// preview is readable for Spanish-speaking visitors too.
+const ogImage = new URL(lang === 'es' ? '/og-es.jpg' : '/og.jpg', Astro.site);
+const ogAlt =
+  lang === 'es'
+    ? 'HaloBits — No es un servicio. Es un socio.'
+    : 'HaloBits — Not a service. A partner.';
+
+// Structured data: tells Google this is a Miami business, how to reach it and
+// which languages it works in (feeds the local-search knowledge panel).
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: SITE.name,
+  url: SITE.url,
+  image: new URL('/og.jpg', Astro.site).toString(),
+  description: description,
+  telephone: SITE.phone,
+  email: SITE.email,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITE.city,
+    addressRegion: SITE.region,
+    addressCountry: SITE.country,
+  },
+  areaServed: { '@type': 'City', name: SITE.city },
+  availableLanguage: ['English', 'Spanish'],
+};
 ---
 
 <!doctype html>
@@ -41,80 +82,102 @@ const ogImage = new URL('/og.png', Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content={SITE.name} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogAlt} />
     <meta property="og:locale" content={lang === 'es' ? 'es_US' : 'en_US'} />
+    <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_US'} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogAlt} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <meta name="theme-color" content={theme === 'light' ? '#EFE6D6' : '#14110F'} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Geist:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-    <!-- View Transitions: enables seamless animated navigation between pages.
-         Uses the browser's native View Transitions API — no JS bundle added.
-         Falls back to instant navigation on unsupported browsers (Firefox). -->
-    <ClientRouter />
   </head>
-  <body>
-    <!-- transition:persist keeps grain and nav alive across page transitions
-         so they don't flash or re-render — they just stay in place. -->
-    <div id="grain" aria-hidden="true" transition:persist></div>
+  <body class:list={{ 'on-cream': theme === 'light' }}>
+    <!-- Film grain: fixed, click-through noise over the whole page. -->
+    <div class="grain" aria-hidden="true"></div>
 
-    <Nav lang={lang} transition:persist />
-    <slot />
+    <Nav lang={lang} current={current} tone={tone} flow={flow} />
+    <main id="main">
+      <slot />
+    </main>
     <Footer lang={lang} />
+    <!-- Vercel Web Analytics: cookieless page views. Only reports once deployed
+         on Vercel with Analytics switched on in the project's dashboard. -->
+    <Analytics />
   </body>
 </html>
 
-<!-- ── Grain generator script ─────────────────────────────────────────────
-     Runs once on load. Creates a 256×256 random noise canvas, converts it
-     to a data URL, and tiles it as the grain div's background. Each page
-     load gets a slightly different grain (canvas random) which looks natural. -->
-<script>
-(function () {
-  const c = document.createElement('canvas');
-  c.width = c.height = 256;
-  const ctx = c.getContext('2d');
-  if (!ctx) return;
-  const d = ctx.createImageData(256, 256);
-  for (let i = 0; i < d.data.length; i += 4) {
-    const v = (Math.random() * 255) | 0;
-    d.data[i] = d.data[i + 1] = d.data[i + 2] = v;
-    d.data[i + 3] = 255;
-  }
-  ctx.putImageData(d, 0, 0);
-  const el = document.getElementById('grain');
-  if (el) el.style.backgroundImage = `url(${c.toDataURL()})`;
-})();
-</script>
-
 <style is:global>
-  /* Grain: fixed, full-screen, above everything */
-  #grain {
+  .grain {
     position: fixed;
-    inset: 0;
-    z-index: 9999;
-    opacity: 0.08;
+    inset: -60px;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.09;
     mix-blend-mode: overlay;
-    background-repeat: repeat;
-    background-size: 256px 256px;
-    pointer-events: none;
-  }
-
-  /* Glass: fixed, full-screen overlay.
-     No backdrop-filter here — that was causing Chrome to suppress section
-     content above it. The "frosted" quality comes from:
-       • The grain overlay (#grain) — adds the grainy rough texture
-       • The haura blobs in the hero — large blurred colour glow visible through
-     This is a very subtle tint only, so it doesn't affect legibility. */
-  .glass {
-    position: fixed;
-    inset: 0;
-    z-index: 10;
-    background: rgba(12, 11, 10, 0.04);
-    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 180px 180px;
+    animation: hb-grain 0.9s steps(3) infinite;
   }
 </style>
+
+<script>
+  // Scroll reveal. Below the first section of each page, headings/paragraphs/
+  // list items start slightly low + transparent and ease in when ~12% visible.
+  // Anything already on screen at load is left alone (no flash), siblings
+  // stagger by 90ms (max 3), and reduced-motion users get none of it
+  // (global.css also un-hides .rv as a safety net).
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && 'IntersectionObserver' in window) {
+    const els = document.querySelectorAll<HTMLElement>(
+      'main > section:not(:first-of-type) :is(h2, h3, p, li, dt, dd, blockquote, figcaption)',
+    );
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('rv-in');
+            io.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
+    );
+    els.forEach((el) => {
+      // Animate the <li> itself, not the paragraphs nested inside it.
+      if (el.closest('li') && el.tagName !== 'LI') return;
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.92) return;
+      const i = Math.min(3, Array.prototype.indexOf.call(el.parentElement?.children ?? [], el));
+      el.style.setProperty('--rv-delay', `${i * 90}ms`);
+      el.classList.add('rv');
+      io.observe(el);
+    });
+  }
+</script>
+
+<script>
+  // Conversion tracking. Buttons carry data-track="event_name" (see Button.astro);
+  // phone and email links are caught automatically. One delegated listener, so
+  // it works for every link on the page. Custom events need a Vercel plan that
+  // includes them — on other plans the call is simply ignored.
+  import { track } from '@vercel/analytics';
+
+  document.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a');
+    if (!a) return;
+    const href = a.getAttribute('href') ?? '';
+    const name = a.dataset.track ?? (href.startsWith('tel:') ? 'click_phone' : href.startsWith('mailto:') ? 'click_email' : '');
+    if (name) track(name);
+  });
+</script>

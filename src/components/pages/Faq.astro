@@ -1,11 +1,11 @@
 ---
-// pages/Faq.astro — accordion FAQ. Each question is a <button> that toggles an
-// answer open/closed. The answer animates with the grid-template-rows 0fr→1fr
-// trick (smooth height animation, no fixed max-height guessing). Accordion
-// behaviour (one open at a time) + the toggle are handled by a tiny script.
+// pages/Faq.astro — cream page: intro on the left, accordion on the right.
+// Each question is a <button aria-expanded aria-controls> inside an <h2>; the
+// "+" icon turns into "×" (45° rotate) when open. The first item starts open.
+// Progressive enhancement: without JS every answer is shown (see <noscript>).
 import Base from '../../layouts/Base.astro';
-import Section from '../Section.astro';
-import CTA from '../sections/CTA.astro';
+import Band from '../ui/Band.astro';
+import Button from '../ui/Button.astro';
 import { content } from '../../i18n/content';
 import { localizePath, type Lang } from '../../i18n/utils';
 
@@ -13,192 +13,161 @@ interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const c = content[lang].faq;
+const t = content[lang].faq;
 const meta = content[lang].meta.faq;
-
-// Resolve an FAQ link: internal paths (start with "/") get localized; external
-// links (http / mailto) are used as-is.
-function resolveHref(href: string) {
-  return href.startsWith('/') ? localizePath(href, lang) : href;
-}
 ---
 
-<Base lang={lang} title={meta.title} description={meta.description}>
-  <Section tone="bg" blobs blobVariant="b">
-    <div class="s-head">
-      <span class="tag">{c.kicker}</span>
-      <h1>{c.title}</h1>
-    </div>
+<Base lang={lang} title={meta.title} description={meta.description} current="faq" tone="light" flow theme="light">
+  <section class="faq">
+    <div class="wrap faq-in">
+      <div class="intro">
+        <h1 class="display">{t.title}</h1>
+        <p class="lead">{t.lead}</p>
+        <Button href={localizePath('/contact/', lang)} variant="ink" class="ask">{t.ask}</Button>
+      </div>
 
-    <div class="faq">
-      {
-        c.items.map((item) => (
-          <div class="faq-item">
-            <button class="faq-q" type="button" aria-expanded="false">
-              <span class="faq-q-text">{item.q}</span>
-              <span class="faq-icon" aria-hidden="true" />
-            </button>
-            <div class="faq-a">
-              <div class="faq-a-inner">
-                <p>{item.a}</p>
-                {item.linkLabel && item.linkHref && (
-                  <a class="faq-link" href={resolveHref(item.linkHref)}>
-                    {item.linkLabel}
-                  </a>
-                )}
+      <div class="list">
+        {
+          t.items.map((q, i) => (
+            <div class="item">
+              <h2>
+                <button type="button" class="q" aria-expanded={i === 0 ? 'true' : 'false'} aria-controls={`faq-${i}`}>
+                  <span>{q.q}</span>
+                  <svg
+                    class="icon"
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="12" r="9.5" />
+                    <path d="M12 8v8M8 12h8" />
+                  </svg>
+                </button>
+              </h2>
+              <div class="a" id={`faq-${i}`} hidden={i !== 0}>
+                <p>{q.a}</p>
+                {q.link && q.href && <a href={localizePath(q.href, lang)}>{q.link}</a>}
               </div>
             </div>
-          </div>
-        ))
-      }
+          ))
+        }
+      </div>
     </div>
-  </Section>
+  </section>
 
-  <CTA lang={lang} />
+  <Band from="#EFE6D6" to="#14110F" />
+
+  <!-- No JS → show every answer instead of hiding them behind dead buttons. -->
+  <noscript>
+    <style is:inline>
+      .a[hidden] {
+        display: block !important;
+      }
+    </style>
+  </noscript>
 </Base>
 
-<!-- Accordion behaviour. Wrapped so it re-runs after Astro View Transitions
-     navigations (astro:page-load fires on first load AND after each swap). -->
-<script>
-  function initFaq() {
-    document.querySelectorAll<HTMLElement>('.faq-item').forEach((item) => {
-      const btn = item.querySelector<HTMLButtonElement>('.faq-q');
-      if (!btn || btn.dataset.bound) return;
-      btn.dataset.bound = 'true';
-      btn.addEventListener('click', () => {
-        const isOpen = item.classList.contains('open');
-        // Close every item (accordion = one open at a time)
-        document.querySelectorAll<HTMLElement>('.faq-item.open').forEach((openItem) => {
-          openItem.classList.remove('open');
-          openItem.querySelector('.faq-q')?.setAttribute('aria-expanded', 'false');
-        });
-        // Open the clicked one (unless it was already open → just collapse)
-        if (!isOpen) {
-          item.classList.add('open');
-          btn.setAttribute('aria-expanded', 'true');
-        }
-      });
-    });
-  }
-  document.addEventListener('astro:page-load', initFaq);
-</script>
-
 <style>
-  .s-head {
-    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
-  }
-  .s-head .tag {
-    margin-bottom: 18px;
-  }
-  .s-head h1 {
-    font-size: clamp(2.6rem, 6vw, 4.6rem);
-    max-width: 16ch;
-  }
-
   .faq {
-    max-width: 780px;
-    border-top: 1px solid var(--line);
+    padding: clamp(72px, 10vw, 150px) 0 clamp(40px, 6vw, 90px);
+    background: var(--cream);
+    color: var(--ink);
+  }
+  .faq-in {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px clamp(40px, 7vw, 120px);
+    align-items: flex-start;
+  }
+  .intro {
+    flex: 4 1 300px;
+    max-width: 30rem;
+  }
+  h1 {
+    font-size: clamp(2.6rem, 5.4vw, 5rem);
+  }
+  .lead {
+    margin-top: 24px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text-on-cream);
+  }
+  :global(.btn.ask) {
+    margin-top: 28px;
   }
 
-  .faq-item {
-    border-bottom: 1px solid var(--line);
+  .list {
+    flex: 7 1 480px;
+    display: flex;
+    flex-direction: column;
   }
-
-  /* Question row — full-width button */
-  .faq-q {
+  .item {
+    border-bottom: 1px solid rgba(20, 17, 15, 0.14);
+  }
+  .q {
     width: 100%;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    padding: 24px 4px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 0;
+    background: none;
+    border: 0;
+    cursor: var(--cursor-hand);
     text-align: left;
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 600;
-    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.2rem, 1.7vw, 1.5rem);
     letter-spacing: -0.02em;
-    color: var(--fg);
-    transition: color 0.15s;
+    line-height: 1.2;
   }
-  .faq-q:hover {
-    color: var(--accent-light);
+  .q:hover {
+    color: var(--rust);
   }
-
-  /* Plus / minus icon built from two pseudo-bars */
-  .faq-icon {
-    position: relative;
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
+  .icon {
+    flex: 0 0 28px;
+    transition: transform 0.3s var(--ease);
   }
-  .faq-icon::before,
-  .faq-icon::after {
-    content: '';
-    position: absolute;
-    background: currentColor;
-    border-radius: 2px;
-    transition: transform 0.3s var(--ease), opacity 0.3s;
+  .q[aria-expanded='true'] .icon {
+    transform: rotate(45deg);
   }
-  .faq-icon::before {
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    transform: translateY(-50%);
+  .a {
+    padding: 0 48px 28px 0;
+    max-width: 40rem;
   }
-  .faq-icon::after {
-    left: 50%;
-    top: 0;
-    width: 2px;
-    height: 100%;
-    transform: translateX(-50%);
+  .a[hidden] {
+    display: none;
   }
-  /* When open, rotate the vertical bar away → "+" becomes "−" */
-  .faq-item.open .faq-icon::after {
-    transform: translateX(-50%) rotate(90deg);
-    opacity: 0;
+  .a p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text-on-cream);
+    text-wrap: pretty;
   }
-  .faq-item.open .faq-q {
-    color: var(--accent-light);
-  }
-
-  /* Answer — animated via grid-template-rows 0fr → 1fr */
-  .faq-a {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.35s var(--ease);
-  }
-  .faq-item.open .faq-a {
-    grid-template-rows: 1fr;
-  }
-  .faq-a-inner {
-    overflow: hidden;
-  }
-  .faq-a-inner p {
-    color: var(--muted);
-    line-height: 1.7;
-    max-width: 64ch;
-    padding: 0 4px 8px;
-  }
-  .faq-link {
-    display: inline-block;
-    margin: 6px 4px 24px;
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--accent-light);
-  }
-  .faq-link:hover {
-    color: var(--fg);
-  }
-
-  /* No-JS fallback: if the script never runs, show all answers so content is
-     never hidden. (Astro ships this script, but defensive is good.) */
-  @media (scripting: none) {
-    .faq-a {
-      grid-template-rows: 1fr;
-    }
+  .a a {
+    display: inline-flex;
+    margin-top: 12px;
+    padding: 6px 0;
+    font-weight: 500;
+    text-underline-offset: 5px;
   }
 </style>
+
+<script>
+  // One handler for the whole list. Questions toggle independently (several can
+  // be open at once), matching the design.
+  document.querySelectorAll<HTMLButtonElement>('.faq .q').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!open));
+      const panel = document.getElementById(btn.getAttribute('aria-controls') ?? '');
+      if (panel) panel.hidden = open;
+    });
+  });
+</script>

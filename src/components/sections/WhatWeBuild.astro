@@ -1,97 +1,115 @@
 ---
-// WhatWeBuild.astro — slightly darker surface with blue + orange blobs.
+// WhatWeBuild.astro — the home page's product INDEX (dark): three big text rows,
+// no cards. The name turns butter on hover; each row links to its anchor on the
+// What we build page.
+import Button from '../ui/Button.astro';
 import { content } from '../../i18n/content';
-import type { Lang } from '../../i18n/utils';
+import { localizePath, type Lang } from '../../i18n/utils';
 
-interface Props { lang: Lang; }
+interface Props {
+  lang: Lang;
+}
 const { lang } = Astro.props;
-const c = content[lang].whatWeBuild;
+const c = content[lang].home.build;
 ---
 
+<section class="build">
+  <div class="wrap">
+    <div class="head">
+      <h2 class="display">{c.title}</h2>
+      <Button href={localizePath('/what-we-build/', lang)} track="cta_build_index">{c.all}</Button>
+    </div>
 
+    <div class="rows">
+      {
+        c.items.map((p) => (
+          <a href={localizePath(p.href, lang)} class="row">
+            <span class="name">{p.name}</span>
+            <span class="meta">
+              <span class="for">{p.for}</span>
+              <span class="line">{p.line}</span>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+
+    <p class="note">{c.note}</p>
+  </div>
+</section>
 
 <style>
-  .wb-section { overflow: hidden; }
-
-  .wb-section::before,
-  .wb-section::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0;
-    height: 140px;
-    pointer-events: none;
-    z-index: 0;
+  .build {
+    background: var(--ink);
+    color: var(--cream);
+    padding: clamp(64px, 8vw, 120px) 0 clamp(60px, 8vw, 120px);
   }
-  .wb-section::before {
-    top: 0;
-    background: linear-gradient(to bottom, rgba(12,11,10,0.70), transparent);
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px 48px;
   }
-  .wb-section::after {
-    bottom: 0;
-    background: linear-gradient(to top, rgba(12,11,10,0.70), transparent);
+  h2 {
+    font-size: clamp(2.2rem, 4.6vw, 4.3rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    max-width: 17ch;
   }
-
-  .wb1 {
-    width: 640px; height: 640px;
-    right: -120px; top: -80px;
-    background: radial-gradient(circle, oklch(0.64 0.12 258 / .30), transparent 70%);
-    filter: blur(70px); z-index: 0;
+  .rows {
+    margin-top: clamp(56px, 7vw, 100px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(40px, 5vw, 64px);
   }
-  .wb2 {
-    width: 500px; height: 500px;
-    left: -80px; bottom: -40px;
-    background: radial-gradient(circle, oklch(0.62 0.13 42 / .26), transparent 70%);
-    filter: blur(80px); z-index: 0;
-  }
-  .wb3 {
-    width: 440px; height: 440px;
-    left: 35%; top: 30%;
-    background: radial-gradient(circle, oklch(0.64 0.12 258 / .12), transparent 70%);
-    filter: blur(90px); z-index: 0;
-  }
-
-  .s-head {
-    max-width: 680px;
-    display: flex; flex-direction: column; gap: 16px;
-    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
-  }
-
-  /* 2×2 grid with hairline separators — from the design */
-  .feat-grid {
+  /* Two fixed columns (name | description) so every description starts on the
+     same vertical line, whatever the name's width. Stacks on phones. */
+  .row {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    overflow: hidden;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: baseline;
+    gap: 10px clamp(24px, 4vw, 64px);
+    text-decoration: none;
+    color: var(--cream);
   }
-  .fcard {
-    padding: 34px 30px;
-    background: rgba(17, 17, 16, 0.60);
-    backdrop-filter: blur(14px);
+  @media (max-width: 799px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
-  .fnum {
-    font-family: 'Geist Mono', 'Geist', monospace;
-    font-size: 11px; font-weight: 500;
-    color: var(--muted-2);
+  .row:hover {
+    color: var(--butter);
+  }
+  .name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.2rem, 5vw, 4.4rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 34rem;
+  }
+  .for {
+    font-size: 13px;
+    font-weight: 500;
     letter-spacing: 0.06em;
-    margin-bottom: 14px;
+    color: var(--apricot);
   }
-  .ftitle {
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: var(--fg);
+  .line {
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--soft);
   }
-  .fbody { font-size: 14px; color: var(--muted); line-height: 1.65; }
-
-  .feat-coda {
-    font-size: 14px; color: var(--muted-2);
-    font-style: italic;
-    margin-top: clamp(2rem, 4vw, 3rem);
-  }
-
-  @media (max-width: 720px) {
-    .feat-grid { grid-template-columns: 1fr; }
+  .note {
+    margin-top: clamp(64px, 8vw, 110px);
+    max-width: 40rem;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted);
   }
 </style>

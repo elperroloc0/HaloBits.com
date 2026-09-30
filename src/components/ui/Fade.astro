@@ -1,0 +1,18 @@
+---
+// Fade.astro — overlay pinned to the bottom of an image section that eases the
+// picture into the colour of the NEXT section. The parent must be
+// position:relative. `height` is a CSS length/percentage.
+import { fadeGradient } from '../../lib/gradients';
+
+interface Props {
+  color: string;
+  height: string;
+}
+const { color, height } = Astro.props;
+---
+
+<div
+  aria-hidden="true"
+  style={`position:absolute;left:0;right:0;bottom:0;height:${height};background:${fadeGradient(color)};pointer-events:none`}
+>
+</div>

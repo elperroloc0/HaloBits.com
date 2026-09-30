@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#1f3fc3" />
-  <text x="16" y="22" font-family="system-ui, sans-serif" font-size="20" font-weight="800" fill="#fef3eb" text-anchor="middle">H</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><radialGradient id="g" cx="38%" cy="34%" r="70%"><stop offset="0" stop-color="#F6C453"/><stop offset=".55" stop-color="#E8642C"/><stop offset="1" stop-color="#B8431A"/></radialGradient></defs><rect width="32" height="32" rx="7" fill="#14110F"/><circle cx="16" cy="16" r="9" fill="url(#g)"/></svg>

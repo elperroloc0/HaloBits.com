@@ -4,6 +4,7 @@
 // by route; we render it in English (the default) but reuse the same layout and
 // design system so it still feels like the site.
 import Base from '../layouts/Base.astro';
+import Button from '../components/ui/Button.astro';
 import { content } from '../i18n/content';
 import { localizePath } from '../i18n/utils';
 
@@ -12,15 +13,15 @@ const c = content[lang].notFound;
 const meta = content[lang].meta.notFound;
 ---
 
-<Base lang={lang} title={meta.title} description={meta.description}>
+<Base lang={lang} title={meta.title} description={meta.description} flow noindex>
   <section class="notfound">
-    <div class="container">
-      <span class="tag">404</span>
-      <h1>{c.title}</h1>
+    <div class="wrap">
+      <p class="eyebrow code">404</p>
+      <h1 class="display">{c.title}</h1>
       <p class="lead">{c.lead}</p>
-      <div class="nf-cta">
-        <a href={localizePath('/', lang)} class="btn btn-primary">{c.home}</a>
-        <a href={localizePath('/what-we-build/', lang)} class="btn btn-ghost">{c.build}</a>
+      <div class="cta">
+        <Button href={localizePath('/', lang)}>{c.home}</Button>
+        <Button href={localizePath('/what-we-build/', lang)} variant="outline">{c.build}</Button>
       </div>
     </div>
   </section>
@@ -28,24 +29,27 @@ const meta = content[lang].meta.notFound;
 
 <style>
   .notfound {
-    padding-block: clamp(96px, 14vw, 160px);
-    text-align: center;
+    padding: clamp(72px, 10vw, 150px) 0 clamp(96px, 12vw, 180px);
   }
-  .notfound .tag {
+  .code {
+    color: var(--apricot);
     margin-bottom: 18px;
   }
-  .notfound h1 {
-    font-size: clamp(2.4rem, 5vw, 3.6rem);
-    margin-bottom: 18px;
+  h1 {
+    font-size: clamp(2.8rem, 7vw, 6.8rem);
+    max-width: 12ch;
   }
-  .notfound .lead {
-    max-width: 44ch;
-    margin: 0 auto 28px;
+  .lead {
+    margin-top: 24px;
+    max-width: 30rem;
+    font-size: clamp(17px, 1.35vw, 19px);
+    line-height: 1.55;
+    color: var(--soft);
   }
-  .nf-cta {
+  .cta {
     display: flex;
-    gap: 12px;
-    justify-content: center;
     flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
   }
 </style>

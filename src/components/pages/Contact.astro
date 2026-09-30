@@ -1,8 +1,15 @@
 ---
-// pages/Contact.astro — collaboration-first contact. Two cards: email us, and a
-// pointer to the product sites (which live elsewhere).
+// pages/Contact.astro — one section: the headline and the form on the big orange sun.
+//
+// The form has NO backend yet (handoff open item #1). Behaviour:
+//   • PUBLIC_CONTACT_ENDPOINT set  → POST the fields as JSON (works with
+//     Formspree-style services). Success / error states are shown in place.
+//   • not set (today)              → fall back to opening the visitor's email app
+//     with a pre-filled mailto: message to hello@halobits.com.
+// Validation (name required, email format, message ≥ 8 chars) runs either way.
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import Section from '../Section.astro';
+import sun from '../../assets/contact-sun.png';
 import { content } from '../../i18n/content';
 import type { Lang } from '../../i18n/utils';
 
@@ -10,80 +17,444 @@ interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const c = content[lang].contact;
+const t = content[lang].contact;
 const meta = content[lang].meta.contact;
+const endpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '';
+
+// Strings the client script needs (it can't import content.ts), as inert JSON.
+const i18n = {
+  send: t.send,
+  sending: t.sending,
+  errName: t.errName,
+  errEmail: t.errEmail,
+  errMsg: t.errMsg,
+  errSend: t.errSend,
+  sentTitle: t.sentTitle,
+  sentBody: t.sentBody,
+  mailTitle: t.mailTitle,
+  mailBody: t.mailBody,
+  subject: t.subject,
+};
 ---
 
-<Base lang={lang} title={meta.title} description={meta.description}>
-  <Section tone="bg">
-    <div class="s-head">
-      <span class="tag">{c.kicker}</span>
-      <h1>{c.title}</h1>
-      <p class="lead">{c.lead}</p>
-    </div>
+<Base lang={lang} title={meta.title} description={meta.description} current="contact">
+  <!-- The form section is the whole page: the old hero was removed, its headline now tops the form. -->
+  <section class="formsec">
+    <Image src={sun} alt="" class="sun" widths={[900, 1400, 1672]} sizes="100vw" loading="lazy" />
+    <div class="fade fade--top" aria-hidden="true"></div>
+    <div class="fade fade--bottom" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="col">
+        <h1>{t.title}</h1>
 
-    <div class="contact-grid">
-      <div class="paper c-block">
-        <h3>{c.emailTitle}</h3>
-        <p>{c.emailBody}</p>
-        <a href={`mailto:${c.email}`} class="btn btn-primary">{c.email}</a>
+        <div id="sent" class="sent" role="status" hidden>
+          <p class="sent-title" id="sent-title"></p>
+          <p class="sent-body" id="sent-body"></p>
+          <button type="button" class="again" id="again">{t.another}</button>
+        </div>
+
+        <form id="contact-form" novalidate data-endpoint={endpoint} data-lang={lang}>
+          <div class="pair">
+            <div class="field">
+              <label for="c-name">{t.name}</label>
+              <input id="c-name" name="name" autocomplete="name" aria-describedby="c-name-e" />
+              <p id="c-name-e" class="err"></p>
+            </div>
+            <div class="field">
+              <label for="c-biz">{t.biz} <span class="opt">{t.optional}</span></label>
+              <input id="c-biz" name="business" autocomplete="organization" placeholder={t.bizPh} />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="c-email">{t.email}</label>
+            <input id="c-email" name="email" type="email" autocomplete="email" inputmode="email" aria-describedby="c-email-e" />
+            <p id="c-email-e" class="err"></p>
+          </div>
+
+          <fieldset class="pref">
+            <legend>{t.pref}</legend>
+            <div class="pills">
+              <button type="button" data-pref="en" aria-pressed={lang === 'en' ? 'true' : 'false'}>English</button>
+              <button type="button" data-pref="es" aria-pressed={lang === 'es' ? 'true' : 'false'}>Español</button>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="c-msg">{t.msg}</label>
+            <textarea id="c-msg" name="message" rows="5" placeholder={t.msgPh} aria-describedby="c-msg-e"></textarea>
+            <p id="c-msg-e" class="err"></p>
+          </div>
+
+          <!-- Honeypot: humans never see it; bots fill it and get dropped. -->
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true" />
+
+          <div class="submit-row">
+            <button type="submit" class="submit" id="submit">
+              <span class="spin" aria-hidden="true" hidden></span>
+              <span id="submit-label">{t.send}</span>
+            </button>
+          </div>
+          <p class="send-err" id="send-err" role="alert"></p>
+        </form>
       </div>
-
-      <div class="paper c-block">
-        <h3>{c.productTitle}</h3>
-        <p>{c.productBody}</p>
-        <a
-          href="https://concierge.halobits.com"
-          class="btn btn-ghost"
-          target="_blank"
-          rel="noopener noreferrer">{c.productCta}</a
-        >
-      </div>
     </div>
+  </section>
 
-    <p class="addr">{c.addr}</p>
-  </Section>
+  <script is:inline type="application/json" id="contact-i18n" set:html={JSON.stringify(i18n)} />
 </Base>
 
 <style>
-  .s-head {
-    margin-bottom: 40px;
+  /* 02 form — sits on the big orange sun, so text is INK (warm black), not cream */
+  .formsec {
+    position: relative;
+    overflow: hidden;
+    color: var(--ink);
+    background: var(--ink);
+    padding: clamp(140px, 15vw, 220px) 0 clamp(120px, 14vw, 200px);
   }
-  .s-head .tag {
-    margin-bottom: 18px;
+  .sun {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: 50% 50%;
   }
-  .s-head h1 {
-    font-size: clamp(2.4rem, 5vw, 3.6rem);
-    margin-bottom: 16px;
+  /* The picture's own edge is near-black; ease it into the page top (under the nav)
+     and the footer below so there is no visible seam. */
+  .fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
   }
-  .s-head .lead {
-    max-width: 52ch;
+  .fade--top {
+    top: 0;
+    height: 26%;
+    background: linear-gradient(180deg, #14110f 0%, rgba(20, 17, 15, 0.92) 14%, rgba(20, 17, 15, 0.7) 32%, rgba(20, 17, 15, 0.38) 52%, rgba(20, 17, 15, 0.14) 74%, rgba(20, 17, 15, 0) 100%);
   }
-  .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin-bottom: 32px;
+  .fade--bottom {
+    bottom: 0;
+    height: 24%;
+    background: linear-gradient(0deg, #14110f 0%, rgba(20, 17, 15, 0.92) 14%, rgba(20, 17, 15, 0.7) 32%, rgba(20, 17, 15, 0.38) 52%, rgba(20, 17, 15, 0.14) 74%, rgba(20, 17, 15, 0) 100%);
   }
-  .c-block {
-    padding: 30px;
+  .wrap {
+    position: relative;
+    z-index: 2;
   }
-  .c-block h3 {
-    margin-bottom: 8px;
-    font-size: 1.3rem;
+  .col {
+    max-width: 40rem;
+    margin: 0 auto;
   }
-  .c-block p {
-    color: var(--muted);
-    margin-bottom: 18px;
-    max-width: 42ch;
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.6rem, 5.6vw, 4.8rem);
+    line-height: 0.94;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
   }
-  .addr {
-    color: var(--muted);
+  form {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+  }
+  .pair .field {
+    flex: 1 1 240px;
+  }
+  label,
+  legend {
+    display: block;
     font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding: 0;
   }
-  @media (max-width: 720px) {
-    .contact-grid {
-      grid-template-columns: 1fr;
-    }
+  legend {
+    margin-bottom: 10px;
+  }
+  .opt {
+    font-weight: 400;
+    color: rgba(20, 17, 15, 0.7);
+  }
+  input,
+  textarea {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: rgba(247, 238, 221, 0.95);
+    color: var(--ink);
+    font: inherit;
+    font-size: 16px;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(20, 17, 15, 0.5);
+  }
+  input {
+    height: 52px;
+    padding: 0 16px;
+  }
+  textarea {
+    padding: 14px 16px;
+    line-height: 1.5;
+    resize: vertical;
+  }
+  input:focus,
+  textarea:focus {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  input[aria-invalid='true'],
+  textarea[aria-invalid='true'] {
+    border-color: #7a1f05;
+    box-shadow: 0 0 0 1px #7a1f05;
+  }
+  .err,
+  .send-err {
+    margin-top: 8px;
+    min-height: 1em;
+    font-size: 14px;
+    font-weight: 600;
+    color: #5a1604;
+  }
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .pref {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .pills {
+    display: flex;
+    gap: 6px;
+  }
+  .pills button {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(20, 17, 15, 0.55);
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: var(--cursor-hand);
+  }
+  .pills button[aria-pressed='true'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--cream);
+  }
+  .pills button:disabled,
+  input:disabled,
+  textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .submit-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 24px;
+  }
+  .submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 54px;
+    padding: 0 28px;
+    border-radius: 999px;
+    border: 0;
+    background: var(--ink);
+    color: var(--cream);
+    font: inherit;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: var(--cursor-hand);
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .submit:hover {
+    background: #2e2722;
+  }
+  .submit:active {
+    transform: scale(0.98);
+  }
+  .submit:disabled {
+    background: rgba(20, 17, 15, 0.6);
+    cursor: progress;
+  }
+  .spin {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(239, 230, 214, 0.35);
+    border-top-color: var(--cream);
+    animation: hb-spin 0.9s linear infinite;
+  }
+  .spin[hidden] {
+    display: none;
+  }
+
+  .sent {
+    margin-top: 40px;
+    padding: 32px 0;
+  }
+  .sent[hidden],
+  form[hidden] {
+    display: none;
+  }
+  .sent-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+  .sent-body {
+    margin-top: 12px;
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 32rem;
+  }
+  .again {
+    margin-top: 24px;
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: 999px;
+    border: 1px solid var(--ink);
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: var(--cursor-hand);
+  }
+  .again:hover {
+    background: var(--ink);
+    color: var(--cream);
   }
 </style>
+
+<script>
+  import { track } from '@vercel/analytics';
+
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const sent = document.getElementById('sent');
+  if (form && sent) {
+    const t = JSON.parse(document.getElementById('contact-i18n')?.textContent ?? '{}');
+    const $ = (id: string) => document.getElementById(id) as HTMLElement;
+    const name = $('c-name') as HTMLInputElement;
+    const biz = $('c-biz') as HTMLInputElement;
+    const email = $('c-email') as HTMLInputElement;
+    const msg = $('c-msg') as HTMLTextAreaElement;
+    const submit = $('submit') as HTMLButtonElement;
+    const label = $('submit-label');
+    const spin = form.querySelector<HTMLElement>('.spin')!;
+    const sendErr = $('send-err');
+    const pills = form.querySelectorAll<HTMLButtonElement>('[data-pref]');
+    let pref = form.dataset.lang ?? 'en';
+
+    // --- validation (rules from the design) --------------------------------
+    const rules = [
+      { el: name, err: 'c-name-e', text: t.errName, bad: () => !name.value.trim() },
+      { el: email, err: 'c-email-e', text: t.errEmail, bad: () => !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim()) },
+      { el: msg, err: 'c-msg-e', text: t.errMsg, bad: () => msg.value.trim().length < 8 },
+    ];
+    const show = (r: (typeof rules)[number], bad: boolean) => {
+      r.el.setAttribute('aria-invalid', String(bad));
+      $(r.err).textContent = bad ? r.text : '';
+    };
+    // Clear an error as soon as the person starts fixing that field.
+    rules.forEach((r) => r.el.addEventListener('input', () => show(r, false)));
+
+    // --- reply-language pills ---------------------------------------------
+    pills.forEach((b) =>
+      b.addEventListener('click', () => {
+        pref = b.dataset.pref ?? 'en';
+        pills.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      }),
+    );
+
+    const setBusy = (busy: boolean) => {
+      [name, biz, email, msg, ...pills].forEach((el) => ((el as HTMLInputElement).disabled = busy));
+      submit.disabled = busy;
+      submit.setAttribute('aria-busy', String(busy));
+      spin.hidden = !busy;
+      label.textContent = busy ? t.sending : t.send;
+    };
+    const done = (title: string, body: string) => {
+      $('sent-title').textContent = title;
+      $('sent-body').textContent = body;
+      form.hidden = true;
+      sent.hidden = false;
+      sent.querySelector('button')?.focus();
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      sendErr.textContent = '';
+      const bads = rules.filter((r) => r.bad());
+      rules.forEach((r) => show(r, bads.includes(r)));
+      if (bads.length) return bads[0].el.focus();
+
+      const data = {
+        name: name.value.trim(),
+        business: biz.value.trim(),
+        email: email.value.trim(),
+        language: pref === 'es' ? 'Español' : 'English',
+        message: msg.value.trim(),
+        _gotcha: (form.elements.namedItem('_gotcha') as HTMLInputElement).value,
+      };
+      const endpoint = form.dataset.endpoint;
+      track('contact_submit');
+
+      if (!endpoint) {
+        // No backend configured: hand the message to the visitor's email app.
+        const body = `${data.message}\n\n— ${data.name}${data.business ? ` · ${data.business}` : ''}\n${data.email}\nReply: ${data.language}`;
+        window.location.href = `mailto:hello@halobits.com?subject=${encodeURIComponent(t.subject)}&body=${encodeURIComponent(body)}`;
+        return done(t.mailTitle, t.mailBody);
+      }
+
+      setBusy(true);
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        done(t.sentTitle, t.sentBody);
+      } catch {
+        sendErr.textContent = t.errSend;
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    $('again').addEventListener('click', () => {
+      form.reset();
+      rules.forEach((r) => show(r, false));
+      sendErr.textContent = '';
+      sent.hidden = true;
+      form.hidden = false;
+      name.focus();
+    });
+  }
+</script>

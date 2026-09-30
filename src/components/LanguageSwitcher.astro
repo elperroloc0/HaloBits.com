@@ -2,6 +2,7 @@
 // LanguageSwitcher.astro — EN / ES toggle. Just two links (no JavaScript): each
 // points at the CURRENT page's twin in the other language, computed by
 // getAlternateUrls. On /about/ it links to /es/about/, and vice-versa.
+// 44px-tall hit areas (tap-target rule); the active language gets a 4px dot.
 import { getAlternateUrls, getLangFromUrl, useTranslations } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
@@ -9,13 +10,13 @@ const alt = getAlternateUrls(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<div class="lang" role="group" aria-label={t.langSwitch.label}>
+<div class="lang" role="group" aria-label={t.langLabel}>
   <a
     href={alt.en}
     hreflang="en"
     lang="en"
     class:list={['lang-link', { active: lang === 'en' }]}
-    aria-current={lang === 'en' ? 'true' : undefined}>EN</a
+    aria-current={lang === 'en' ? 'true' : undefined}>EN<span class="dot" aria-hidden="true"></span></a
   >
   <span class="sep" aria-hidden="true">/</span>
   <a
@@ -23,29 +24,47 @@ const t = useTranslations(lang);
     hreflang="es"
     lang="es"
     class:list={['lang-link', { active: lang === 'es' }]}
-    aria-current={lang === 'es' ? 'true' : undefined}>ES</a
+    aria-current={lang === 'es' ? 'true' : undefined}>ES<span class="dot" aria-hidden="true"></span></a
   >
 </div>
 
 <style>
   .lang {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
   }
   .lang-link {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: rgba(240, 235, 229, 0.40);
-    padding: 2px 2px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 44px;
     text-decoration: none;
-    transition: color 0.15s;
+    color: var(--nav-muted);
   }
-  .lang-link:hover { color: #f0ebe5; }
-  .lang-link.active { color: #f0ebe5; }
+  .lang-link:hover,
+  .lang-link.active {
+    color: var(--nav-fg);
+  }
+  .dot {
+    position: absolute;
+    left: 50%;
+    bottom: 7px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--nav-fg);
+    opacity: 0;
+  }
+  .active .dot {
+    opacity: 1;
+  }
   .sep {
-    color: rgba(240, 235, 229, 0.20);
-    font-size: 12px;
+    color: var(--nav-faint);
   }
 </style>

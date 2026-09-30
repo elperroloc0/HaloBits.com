@@ -1,0 +1,45 @@
+---
+// Button.astro — the pill button from the design (see .btn in global.css).
+// `variant` picks the colour pair, `size` the height. The little "dot → arrow"
+// icon is part of the design; turn it off with arrow={false}.
+interface Props {
+  href: string;
+  variant?: 'cream' | 'ink' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  arrow?: boolean;
+  /** Opens in a new tab (used for product sites on other subdomains). */
+  external?: boolean;
+  /** Analytics event name, sent on click (see the tracking script in Base.astro). */
+  track?: string;
+  class?: string;
+}
+const { href, variant = 'cream', size = 'md', arrow = true, external = false, track, class: extra } = Astro.props;
+const icon = size === 'sm' ? 15 : 18;
+---
+
+<a
+  href={href}
+  class:list={['btn', `btn--${variant}`, { 'btn--sm': size === 'sm', 'btn--lg': size === 'lg' }, extra]}
+  data-track={track}
+  {...external ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+>
+  <slot />
+  {
+    arrow && (
+      <svg
+        width={icon}
+        height={icon}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="5" cy="12" r="2" />
+        <path d="M9.5 12h10M15.5 8l4 4-4 4" />
+      </svg>
+    )
+  }
+</a>

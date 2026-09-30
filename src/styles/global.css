@@ -1,252 +1,293 @@
 /* =============================================================================
-   global.css — dark-theme design system.
+   global.css — "Warm tech" design system (warm black + cream, golden-hour art).
+
+   Only things used by MORE THAN ONE component live here: tokens, reset, the page
+   wrapper, buttons, the text link, type helpers and scroll-reveal. Anything used
+   by a single component is in that component's <style> block (Astro scopes it).
+
+   The previous (blue, dark-glass) theme is preserved in git: tag `v1-old-design`.
    ============================================================================ */
 
 :root {
-  /* --- Dark palette --- */
-  --bg:      #0c0b0a;
-  --surface: #111110;
-  --fg:      #f0ebe5;
+  /* --- Surfaces --- */
+  --ink:        #14110f; /* warm black: page + dark sections   */
+  --ink-soft:   #1e1916; /* frames, inputs on dark             */
+  --ink-contact:#130401; /* contact hero only                  */
+  --cream:      #efe6d6; /* light sections, text on dark       */
+  --sand:       #eddec4; /* "philosophy" section               */
+  --paper:      #ebe3d6; /* "custom work" section              */
+  --frame:      #e4d8c4; /* frames / pressed state on cream    */
+  --frame-2:    #e2d2b6;
 
-  /* Brand */
-  --accent:       #1f3fc3;
-  --accent-deep:  #172fa8;
-  --accent-light: #5973d8;
+  /* --- Text --- */
+  --text-on-cream:  #4a3f37;
+  --text-on-cream-2:#5c5047;
+  --muted:          #b5a898; /* muted on dark */
+  --soft:           #d9cebf; /* body on dark  */
 
-  /* Text */
-  --ink:       #f0ebe5;
-  --muted:     rgba(240, 235, 229, 0.50);
-  --muted-2:   rgba(240, 235, 229, 0.28);
+  /* --- Accents (orange is for light/orbs only — never a button) --- */
+  --orange:  #e8642c;
+  --apricot: #f3a15f;
+  --butter:  #f6c453;
+  --rust:    #9a3714; /* deep orange text on cream */
+  --violet:  #a08dbf;
+  --violet-2:#c9b8de;
 
-  /* Lines / borders */
-  --line:   rgba(240, 235, 229, 0.07);
-  --line-2: rgba(240, 235, 229, 0.13);
+  /* --- Type --- */
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body:    'Geist', system-ui, sans-serif;
 
-  /* Shadows (less useful on dark, kept for components) */
-  --shadow-soft: 0 6px 28px -10px rgba(0, 0, 0, 0.45);
-  --shadow-card: 0 14px 50px -16px rgba(0, 0, 0, 0.55);
-
-  /* Radii */
-  --r:    18px;
-  --pill: 99px;
-
-  /* Layout widths */
-  --maxw:       1200px;
-  --maxw-wide:  1320px;
-  --maxw-prose: 64ch;
-
-  /* Vertical rhythm */
-  --section-y: clamp(64px, 9vw, 120px);
-
-  /* Orb palette — from the HaloBits Landing design */
-  --vb: oklch(0.58 0.14 255);   /* blue-slate   */
-  --vm: oklch(0.50 0.09 335);   /* dusty mauve  */
-  --vo: oklch(0.70 0.13 48);    /* warm orange  */
-  --or: oklch(0.62 0.13 42);    /* ambient orange */
-  --pw: oklch(0.64 0.12 258);   /* blue-purple  */
-  --cr: oklch(0.83 0.06 82);    /* warm cream   */
+  /* --- Layout --- */
+  --maxw: 1440px;
+  --gutter: clamp(20px, 4vw, 56px);
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* --- View Transitions -------------------------------------------------------
-   ::view-transition-old = the page leaving
-   ::view-transition-new = the page entering
-   The background gradient stays, only the page content fades — so the dark-to-
-   blue body gradient feels continuous as you navigate between pages. ---------- */
-::view-transition-old(root) {
-  animation: 220ms cubic-bezier(0.4, 0, 1, 1) both vt-out;
-}
-::view-transition-new(root) {
-  animation: 340ms cubic-bezier(0, 0, 0.2, 1) 60ms both vt-in;
-}
-@keyframes vt-out {
-  to { opacity: 0; transform: scale(0.985) translateY(-4px); }
-}
-@keyframes vt-in {
-  from { opacity: 0; transform: scale(0.985) translateY(6px); }
-}
-/* Respect reduced-motion preference */
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) { animation: none; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-/* --- Z-index system ------------------------------------------------------
-   0-9  : background blobs / orbs (behind glass)
-   10   : glass layer (fixed)
-   20   : page content (sections, text)
-   100  : nav
-   9999 : grain overlay (texture, above everything)
-   ------------------------------------------------------------------------ */
-
-/* --- CSS-only float/drift animations for orbs ---------------------------- */
-@keyframes hb-float-a {
-  0%, 100% { transform: translate(0, 0); }
-  50%       { transform: translate(-10px, -18px); }
-}
-@keyframes hb-float-b {
-  0%, 100% { transform: translate(0, 0); }
-  50%       { transform: translate(14px, -10px); }
-}
-@keyframes hb-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50%       { transform: translate(-20px, 30px) scale(1.06); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .haura, .vorb, .blob { animation: none !important; }
-}
-
-/* --- Reset --------------------------------------------------------------- */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
+html,
 body {
-  /* Gradient spans the full document height — each section is transparent
-     so this shows through. Top = hero dark, bottom = brand blue at the CTA.
-     Percentages are approximate based on the 5-section page structure. */
-  background: linear-gradient(
-    to bottom,
-    #0c0b0a  0%,    /* hero: near-black                */
-    #0c0b0a 30%,    /* philosophy: stays dark           */
-    #0c0d18 48%,    /* what we build: first hint of blue*/
-    #0e1540 62%,    /* how we partner: getting blue     */
-    #152990 78%,    /* approaching CTA                  */
-    #1f3fc3 92%,    /* CTA: full brand blue             */
-    #1f3fc3 100%
-  );
-  color: var(--ink);
-  font-family: 'Geist', -apple-system, system-ui, sans-serif;
-  font-weight: 300;
-  letter-spacing: -0.011em;
-  line-height: 1.6;
+  margin: 0;
+  background: var(--ink);
+  color: var(--cream);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: var(--font-body);
   overflow-x: hidden;
 }
 
-/* --- Typography ---------------------------------------------------------- */
-h1, .display-h {
-  font-family: 'Bricolage Grotesque', sans-serif;
-  font-weight: 800;
-  font-size: clamp(3rem, 7vw, 6rem);
-  line-height: 0.97;
-  letter-spacing: -0.04em;
+a {
+  color: var(--cream);
 }
-h2 {
-  font-family: 'Bricolage Grotesque', sans-serif;
-  font-weight: 700;
-  font-size: clamp(2rem, 4.8vw, 3.6rem);
-  line-height: 1.04;
-  letter-spacing: -0.03em;
-}
-h3 {
-  font-weight: 600;
-  font-size: 1.05rem;
-  letter-spacing: -0.02em;
-  line-height: 1.3;
-}
-p, li { font-size: 16px; }
-
-.lead {
-  font-size: clamp(0.95rem, 1.5vw, 1.12rem);
-  color: var(--muted);
-  line-height: 1.65;
+a:hover {
+  color: var(--butter);
 }
 
-em.ac { font-style: normal; color: var(--accent-light); }
+::selection {
+  background: var(--butter);
+  color: var(--ink);
+}
+:focus-visible {
+  outline: 2px solid var(--butter);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+/* --- Cream pages (FAQ): body.on-cream flips the page to light. -----------------
+   :where() keeps these rules at zero specificity so component classes such as
+   .btn--ink still win over them. */
+body.on-cream {
+  background: var(--cream);
+  color: var(--ink);
+}
+:where(.on-cream) a {
+  color: inherit;
+}
+:where(.on-cream) a:hover {
+  color: var(--rust);
+}
+/* The butter focus ring is invisible on cream — use deep orange instead. */
+.on-cream :focus-visible {
+  outline-color: var(--rust);
+}
 
-a { color: var(--accent-light); text-decoration: none; }
-a:hover { color: var(--bg); }
+img {
+  display: block;
+  max-width: 100%;
+}
+h1, h2, h3, p, figure, dl, dd, ul, blockquote {
+  margin: 0;
+}
 
-/* --- Layout -------------------------------------------------------------- */
-.container {
+/* --- Retro cursor ---------------------------------------------------------------
+   Pixel-art arrow + pointing hand (cream fill, warm-black outline, so it shows on
+   dark AND cream sections). Pure CSS data-URI SVGs: no JS, no extra requests.
+   Text fields keep the browser's text caret; touch screens have no cursor at all.
+   The keyword after the URL is the fallback if the image can't load. */
+:root {
+  --cursor-arrow: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='34' viewBox='0 0 12 17' shape-rendering='crispEdges'><path fill='%23EFE6D6' d='M1 2h1v1h-1zM1 3h2v1h-2zM1 4h3v1h-3zM1 5h4v1h-4zM1 6h5v1h-5zM1 7h6v1h-6zM1 8h7v1h-7zM1 9h8v1h-8zM1 10h5v1h-5zM1 11h2v1h-2zM4 11h2v1h-2zM1 12h1v1h-1zM5 12h2v1h-2zM5 13h2v1h-2zM6 14h2v1h-2zM6 15h2v1h-2z'/><path fill='%2314110F' d='M0 0h1v1h-1zM0 1h2v1h-2zM0 2h1v1h-1zM2 2h1v1h-1zM0 3h1v1h-1zM3 3h1v1h-1zM0 4h1v1h-1zM4 4h1v1h-1zM0 5h1v1h-1zM5 5h1v1h-1zM0 6h1v1h-1zM6 6h1v1h-1zM0 7h1v1h-1zM7 7h1v1h-1zM0 8h1v1h-1zM8 8h1v1h-1zM0 9h1v1h-1zM9 9h1v1h-1zM0 10h1v1h-1zM6 10h5v1h-5zM0 11h1v1h-1zM3 11h1v1h-1zM6 11h1v1h-1zM0 12h1v1h-1zM2 12h1v1h-1zM4 12h1v1h-1zM7 12h1v1h-1zM0 13h2v1h-2zM4 13h1v1h-1zM7 13h1v1h-1zM0 14h1v1h-1zM5 14h1v1h-1zM8 14h1v1h-1zM5 15h1v1h-1zM8 15h1v1h-1zM6 16h2v1h-2z'/></svg>") 0 0, auto;
+  --cursor-hand: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 16 16' shape-rendering='crispEdges'><path fill='%23EFE6D6' d='M4 1h2v1h-2zM4 2h2v1h-2zM4 3h2v1h-2zM4 4h2v1h-2zM4 5h2v1h-2zM7 5h2v1h-2zM4 6h2v1h-2zM7 6h2v1h-2zM10 6h2v1h-2zM1 7h2v1h-2zM4 7h10v1h-10zM1 8h13v1h-13zM2 9h12v1h-12zM2 10h12v1h-12zM3 11h11v1h-11zM3 12h11v1h-11zM4 13h9v1h-9zM4 14h9v1h-9z'/><path fill='%2314110F' d='M4 0h2v1h-2zM3 1h1v1h-1zM6 1h1v1h-1zM3 2h1v1h-1zM6 2h1v1h-1zM3 3h1v1h-1zM6 3h1v1h-1zM3 4h1v1h-1zM6 4h3v1h-3zM3 5h1v1h-1zM6 5h1v1h-1zM9 5h3v1h-3zM1 6h3v1h-3zM6 6h1v1h-1zM9 6h1v1h-1zM12 6h2v1h-2zM0 7h1v1h-1zM3 7h1v1h-1zM14 7h1v1h-1zM0 8h1v1h-1zM14 8h1v1h-1zM1 9h1v1h-1zM14 9h1v1h-1zM1 10h1v1h-1zM14 10h1v1h-1zM2 11h1v1h-1zM14 11h1v1h-1zM2 12h1v1h-1zM14 12h1v1h-1zM3 13h1v1h-1zM13 13h1v1h-1zM3 14h1v1h-1zM13 14h1v1h-1zM4 15h9v1h-9z'/></svg>") 8 0, pointer;
+}
+html {
+  cursor: var(--cursor-arrow);
+}
+a,
+button,
+summary,
+label,
+select,
+[role='button'] {
+  cursor: var(--cursor-hand);
+}
+button:disabled,
+input:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+
+/* --- Page wrapper: centred 1440px column with responsive side padding ------ */
+.wrap {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 clamp(1.5rem, 5vw, 2.5rem);
-}
-.container-wide {
-  max-width: var(--maxw-wide);
-  margin: 0 auto;
-  padding: 0 clamp(1.5rem, 5vw, 2.5rem);
+  padding: 0 var(--gutter);
 }
 
-/* --- Tag pill ------------------------------------------------------------ */
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 11px;
+/* --- Gradient band between two flat sections (see lib/gradients.ts) --------- */
+.band {
+  height: clamp(160px, 18vw, 300px);
+  margin: -1px 0; /* overlap by 1px so no hairline shows between sections */
+}
+
+/* --- Type helpers ----------------------------------------------------------- */
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.eyebrow {
+  font-size: 11.5px;
   font-weight: 600;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #fff;
-  padding: 7px 14px;
-
 }
 
-/* --- Buttons ------------------------------------------------------------- */
+/* --- Buttons ----------------------------------------------------------------
+   Three variants, three sizes. No orange buttons — by design.
+     cream   primary on dark      ink     primary on cream      outline  secondary on dark */
 .btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 13px 26px;
-  border-radius: var(--pill);
-  font-family: 'Geist', sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  border: none;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px 0 26px;
+  border-radius: 999px;
   white-space: nowrap;
   text-decoration: none;
-  transition: transform 0.15s var(--ease), opacity 0.15s;
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: var(--cursor-hand);
+  border: 0;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
 }
-.btn:hover { transform: translateY(-1px); }
-.btn-primary, .btn-solid { background: var(--fg); color: #0c0b0a; }
-.btn-primary:hover, .btn-solid:hover { opacity: 0.9; }
-.btn-ghost {
+.btn:active {
+  transform: scale(0.98);
+}
+.btn--sm {
+  min-height: 44px;
+  padding: 0 19px 0 21px;
+  gap: 8px;
+  font-size: 14px;
+}
+.btn--lg {
+  min-height: 54px;
+}
+.btn--cream {
+  background: var(--cream);
+  color: var(--ink);
+}
+.btn--cream:hover {
+  background: #fbf6ee;
+  color: var(--ink);
+}
+.btn--cream:active {
+  background: var(--frame);
+}
+.btn--ink {
+  background: var(--ink);
+  color: var(--cream);
+}
+.btn--ink:hover {
+  background: #2e2722;
+  color: var(--cream);
+}
+.btn--outline {
+  border: 1px solid rgba(239, 230, 214, 0.45);
+  color: var(--cream);
   background: transparent;
-  color: var(--fg);
-  border: 1px solid var(--line-2);
 }
-.btn-ghost:hover { background: rgba(240, 235, 229, 0.06); color:var(--fg)}
-
-/* --- Cards / surfaces ---------------------------------------------------- */
-.paper {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-}
-.card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--line-2);
-  border-radius: var(--r);
-  box-shadow: var(--shadow-card);
+.btn--outline:hover {
+  background: var(--cream);
+  color: var(--ink);
 }
 
-/* --- Section bands ------------------------------------------------------- */
-.band {
-  position: relative;
-  z-index: 20; /* above glass layer (z-index: 10) */
-  width: 100%;
-  padding-block: var(--section-y);
-  overflow: hidden;
+/* Underlined text link that sits beside a button ("Let's talk"). */
+.tlink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--cream);
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: underline;
+  text-decoration-color: rgba(239, 230, 214, 0.5);
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
 }
-/* All sections are transparent — the body gradient flows through.
-   band-surface adds a faint white tint that fades in/out at its edges
-   so sections blend into each other instead of cutting hard. */
-.band-bg { background: transparent; }
-
-.band-surface {
-  background: transparent;
+.tlink:hover {
+  color: var(--butter);
+  text-decoration-color: var(--butter);
 }
-/* band-surface: section fades are now handled per-component via ::before/::after
-   on the section-specific class, so there's no conflict. */
+.tlink--lg {
+  min-height: 54px;
+  font-size: 16px;
+}
 
-/* --- Shared blob helper -------------------------------------------------- */
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
+/* --- Scroll reveal -----------------------------------------------------------
+   The script in Base.astro adds .rv to text that starts below the fold, then
+   .rv-in when it scrolls into view. No JS → nothing is ever hidden. */
+.rv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.9s var(--ease) var(--rv-delay, 0ms),
+    transform 0.9s var(--ease) var(--rv-delay, 0ms);
+}
+.rv.rv-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Motion --------------------------------------------------------------- */
+@keyframes hb-grain {
+  0% { background-position: 0 0; }
+  33% { background-position: -43px 27px; }
+  66% { background-position: 31px -52px; }
+  100% { background-position: 0 0; }
+}
+@keyframes hb-travel {
+  0% { left: 0; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+@keyframes hb-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  .rv {
+    opacity: 1;
+    transform: none;
+  }
 }
