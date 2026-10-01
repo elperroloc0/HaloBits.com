@@ -45,13 +45,23 @@ const alt = getAlternateUrls(Astro.url);
 const canonicalURL = new URL(alt[lang], Astro.site);
 const enURL = new URL(alt.en, Astro.site);
 const esURL = new URL(alt.es, Astro.site);
+const ruURL = new URL(alt.ru, Astro.site);
 // One share image per language (1200×630) so the WhatsApp/iMessage/LinkedIn
-// preview is readable for Spanish-speaking visitors too.
-const ogImage = new URL(lang === 'es' ? '/og-es.jpg' : '/og.jpg', Astro.site);
-const ogAlt =
-  lang === 'es'
-    ? 'HaloBits — No es un servicio. Es un socio.'
-    : 'HaloBits — Not a service. A partner.';
+// preview is readable for every visitor: public/og.jpg, og-es.jpg, og-ru.jpg.
+const ogImage = new URL({ en: '/og.jpg', es: '/og-es.jpg', ru: '/og-ru.jpg' }[lang], Astro.site);
+const ogAlts = {
+  en: 'HaloBits — Not a service. A partner.',
+  es: 'HaloBits — No es un servicio. Es un socio.',
+  ru: 'HaloBits — Не услуга, а партнёр.',
+};
+const ogAlt = ogAlts[lang];
+// Bricolage Grotesque and Geist have no Cyrillic, so Russian pages also load Onest
+// (global.css lists it as a fallback). Only /ru/ pays for that extra download.
+const fontsHref =
+  'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@300;400;500;600' +
+  (lang === 'ru' ? '&family=Onest:wght@500;700;800' : '') +
+  '&display=swap';
+const ogLocales = { en: 'en_US', es: 'es_US', ru: 'ru_RU' };
 
 // Structured data: tells Google this is a Miami business, how to reach it and
 // which languages it works in (feeds the local-search knowledge panel).
@@ -72,7 +82,7 @@ const jsonLd = {
     addressCountry: SITE.country,
   },
   areaServed: { '@type': 'City', name: SITE.city },
-  availableLanguage: ['English', 'Spanish'],
+  availableLanguage: ['English', 'Spanish', 'Russian'],
   // sameAs: add Google Business Profile / LinkedIn / Instagram URLs here once they exist.
 };
 ---
@@ -88,6 +98,7 @@ const jsonLd = {
     <link rel="canonical" href={canonicalURL} />
     <link rel="alternate" hreflang="en" href={enURL} />
     <link rel="alternate" hreflang="es" href={esURL} />
+    <link rel="alternate" hreflang="ru" href={ruURL} />
     <link rel="alternate" hreflang="x-default" href={enURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -98,8 +109,8 @@ const jsonLd = {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={ogAlt} />
-    <meta property="og:locale" content={lang === 'es' ? 'es_US' : 'en_US'} />
-    <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_US'} />
+    <meta property="og:locale" content={ogLocales[lang]} />
+    {Object.entries(ogLocales).filter(([l]) => l !== lang).map(([, loc]) => <meta property="og:locale:alternate" content={loc} />)}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -116,10 +127,11 @@ const jsonLd = {
     <meta name="theme-color" content={theme === 'light' ? '#EFE6D6' : '#14110F'} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts load without blocking the first paint (text shows in the fallback font
+         and swaps when they arrive). `media=print` → `all` on load is the standard
+         non-blocking stylesheet trick; <noscript> keeps them working without JS. -->
+    <link href={fontsHref} rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href={fontsHref} rel="stylesheet" /></noscript>
   </head>
   <body class:list={{ 'on-cream': theme === 'light' }}>
     <!-- Film grain: fixed, click-through noise over the whole page. -->
@@ -189,7 +201,7 @@ const jsonLd = {
   //   cta_click               buttons marked data-track="cta_*"
   //   phone_click / sms_click / whatsapp_click / calendar_click / email_click   by href
   //   outbound_concierge_click   links to concierge.halobits.com
-  //   language_switch          the EN / ES toggle
+  //   language_switch          the EN / ES / RU toggle
   // Custom events need a Vercel plan that includes them; otherwise ignored.
   import { track } from '@vercel/analytics';
 

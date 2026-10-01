@@ -68,9 +68,11 @@ const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).join('').s
       <dl class="details">
         {
           t.details.map((d) => (
-            <div class="detail">
+            <div class="detail" tabindex="0">
               <dt>{d.t}</dt>
-              <dd>{d.b}</dd>
+              <dd>
+                <div>{d.b}</div>
+              </dd>
             </div>
           ))
         }
@@ -144,6 +146,23 @@ const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).join('').s
   </section>
 </Base>
 
+<script>
+  // A tile that grows wider than the space left in its row would wrap to the next
+  // line right under the cursor and flicker. So when one opens we cap its answer
+  // width to the room that is actually left in the row (never below ~12rem).
+  const details = document.querySelector<HTMLElement>('.details');
+  details?.querySelectorAll<HTMLElement>('.detail').forEach((tile) => {
+    const fit = () => {
+      const room = details.getBoundingClientRect().right - tile.getBoundingClientRect().left;
+      const pad = parseFloat(getComputedStyle(tile).paddingLeft) + parseFloat(getComputedStyle(tile).paddingRight);
+      const max = 23 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+      tile.style.setProperty('--dd-w', `${Math.max(192, Math.min(max, room - pad - 2))}px`);
+    };
+    tile.addEventListener('pointerenter', fit);
+    tile.addEventListener('focusin', fit);
+  });
+</script>
+
 <style>
   .hero {
     position: relative;
@@ -180,7 +199,7 @@ const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).join('').s
   }
   .hero h1 {
     font-size: clamp(2.8rem, 7vw, 6.8rem);
-    max-width: 12ch;
+    max-width: 22ch;
   }
 
   .studio {
@@ -189,7 +208,7 @@ const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).join('').s
     padding: clamp(40px, 6vw, 100px) 0 clamp(40px, 6vw, 90px);
   }
   .essential {
-    max-width: 46rem;
+    max-width: 66rem;
     font-family: var(--font-display);
     font-weight: 500;
     font-size: clamp(1.5rem, 2.6vw, 2.3rem);
@@ -197,32 +216,136 @@ const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).join('').s
     letter-spacing: -0.02em;
     text-wrap: pretty;
   }
+  /* Compact tiles, each as small as its question. Hover or keyboard focus grows
+     the tile (width and height) to fit the answer and the others reflow around
+     it, so the section stays short. The answer stays in the DOM, so screen
+     readers read it. */
   .details {
-    margin-top: clamp(72px, 9vw, 130px);
-    display: flex;
-    flex-direction: column;
-    gap: clamp(40px, 5vw, 64px);
-  }
-  .detail {
+    --dd-w: min(23rem, calc(100vw - 2 * var(--gutter) - 56px));
+    margin-top: clamp(56px, 7vw, 100px);
     display: flex;
     flex-wrap: wrap;
-    gap: 10px clamp(32px, 6vw, 96px);
+    align-items: flex-start;
+    gap: 12px;
   }
-  dt {
-    flex: 0 1 280px;
+  .detail {
+    position: relative;
+    padding: 20px 56px 20px 26px;
+    border-radius: 20px;
+    background: var(--ink);
+    color: var(--cream);
+    cursor: default;
+    transition:
+      background-color 0.6s ease 0.2s,
+      color 0.6s ease 0.2s;
+  }
+  .detail::after {
+    content: '+';
+    position: absolute;
+    top: 17px;
+    right: 22px;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(1.4rem, 2vw, 1.8rem);
-    letter-spacing: -0.025em;
-    line-height: 1.1;
+    font-size: 1.7rem;
+    line-height: 1;
+    transition: transform 0.6s ease 0.2s;
   }
+  dt {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.25rem, 1.7vw, 1.55rem);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+  /* Collapsed: zero width and zero-height row. Open: both grow smoothly. */
   dd {
-    flex: 1 1 360px;
-    max-width: 38rem;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--text-on-cream);
+    display: grid;
+    grid-template-rows: 0fr;
+    width: 0;
+    color: var(--ink);
+    opacity: 0;
+    /* Closing waits 0.2s (so a passing cursor doesn't make tiles jump), then eases shut. */
+    transition:
+      grid-template-rows 0.8s cubic-bezier(0.25, 0.6, 0.2, 1) 0.2s,
+      width 0.8s cubic-bezier(0.25, 0.6, 0.2, 1) 0.2s,
+      opacity 0.5s ease 0.2s;
+  }
+  dd > div {
+    min-height: 0;
+    overflow: hidden;
+    width: var(--dd-w);
+    padding-top: 0;
+    font-size: clamp(15px, 1.2vw, 17px);
+    line-height: 1.55;
     text-wrap: pretty;
+    transition: padding-top 0.8s cubic-bezier(0.25, 0.6, 0.2, 1) 0.2s;
+  }
+  .detail:hover,
+  .detail:focus-visible,
+  .detail:focus-within {
+    background: var(--butter);
+    color: var(--ink);
+    outline: none;
+    /* Opening starts after a short pause, then glides. */
+    transition-delay: 0.12s;
+  }
+  .detail:hover dd,
+  .detail:focus-visible dd,
+  .detail:focus-within dd {
+    grid-template-rows: 1fr;
+    width: var(--dd-w);
+    opacity: 1;
+    transition-delay: 0.12s;
+  }
+  .detail:hover dd > div,
+  .detail:focus-visible dd > div,
+  .detail:focus-within dd > div {
+    padding-top: 12px;
+    transition-delay: 0.12s;
+  }
+  .detail:hover::after,
+  .detail:focus-visible::after,
+  .detail:focus-within::after {
+    transform: rotate(45deg);
+    transition-delay: 0.12s;
+  }
+  .detail:focus-visible {
+    box-shadow: 0 0 0 3px var(--rust);
+  }
+  /* Touch screens have no hover: show every answer, stacked. */
+  @media (hover: none) {
+    .details {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .detail {
+      background: var(--butter);
+      color: var(--ink);
+    }
+    .detail::after {
+      display: none;
+    }
+    dt {
+      white-space: normal;
+    }
+    dd {
+      grid-template-rows: 1fr;
+      width: auto;
+      opacity: 1;
+    }
+    dd > div {
+      width: auto;
+      padding-top: 12px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .detail,
+    .detail::after,
+    dd,
+    dd > div {
+      transition: none;
+    }
   }
 
   .team {

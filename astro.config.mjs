@@ -14,14 +14,15 @@ export default defineConfig({
   // baked into the *built* output.
   site: 'https://halobits.com',
 
-  // i18n routing. We serve two languages:
+  // i18n routing. We serve three languages:
   //   en → at the root   (/, /about/, ...)         because prefixDefaultLocale=false
   //   es → under /es/     (/es/, /es/about/, ...)
+  //   ru → under /ru/     (/ru/, /ru/about/, ...)
   // This gives Astro `Astro.currentLocale` and tells integrations (sitemap) about
-  // our locales. The actual ES pages live in src/pages/es/.
+  // our locales. The actual ES / RU pages live in src/pages/es/ and src/pages/ru/.
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'es'],
+    locales: ['en', 'es', 'ru'],
     routing: { prefixDefaultLocale: false },
   },
 
@@ -34,7 +35,7 @@ export default defineConfig({
     sitemap({
       i18n: {
         defaultLocale: 'en',
-        locales: { en: 'en-US', es: 'es-US' },
+        locales: { en: 'en-US', es: 'es-US', ru: 'ru-US' },
       },
     }),
   ],

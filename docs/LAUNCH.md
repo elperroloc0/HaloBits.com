@@ -15,7 +15,7 @@
 ## 2. Google Search Console
 1. search.google.com/search-console → **Add property → URL prefix → https://halobits.com**.
 2. Choose **HTML tag**, copy only the `content="..."` value into `PUBLIC_GSC_VERIFICATION`, redeploy, click Verify. (Or verify via DNS TXT record instead — then the env var is not needed.)
-3. Sitemaps → submit `sitemap-index.xml`. A week later check Pages → both `/` and `/es/` URLs are indexed.
+3. Sitemaps → submit `sitemap-index.xml`. A week later check Pages → the `/`, `/es/` and `/ru/` URLs are indexed.
 
 ## 3. Email deliverability for hello@halobits.com (DNS, do at your DNS host)
 - [ ] **SPF**: one TXT record on `halobits.com`: `v=spf1 include:<your mail provider> ~all` (only ONE spf record allowed; include your form-delivery service too if it sends as @halobits.com).

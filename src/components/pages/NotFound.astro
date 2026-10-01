@@ -1,7 +1,8 @@
 ---
 // pages/NotFound.astro — the 404 page, one per language. src/pages/404.astro is
-// English (Astro → /404.html, Vercel's default); src/pages/es/404.astro is
-// Spanish, and vercel.json routes unknown /es/... URLs to it.
+// English (Astro → /404.html, Vercel's default); src/pages/es/404.astro and
+// src/pages/ru/404.astro are the others; vercel.json routes unknown /es/... and
+// /ru/... URLs to them.
 import Base from '../../layouts/Base.astro';
 import Button from '../ui/Button.astro';
 import { content } from '../../i18n/content';

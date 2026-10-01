@@ -19,6 +19,7 @@
       "continue": true
     },
     { "handle": "filesystem" },
-    { "src": "/es(/.*)?", "status": 404, "dest": "/es/404/index.html" }
+    { "src": "/es(/.*)?", "status": 404, "dest": "/es/404/index.html" },
+    { "src": "/ru(/.*)?", "status": 404, "dest": "/ru/404/index.html" }
   ]
 }

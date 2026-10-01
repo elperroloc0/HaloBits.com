@@ -7,14 +7,15 @@
 // fails. Translations can never silently drift out of sync.
 // =============================================================================
 
-// The languages we ship. `as const` makes the keys literal types ('en' | 'es')
+// The languages we ship. `as const` makes the keys literal types ('en' | 'es' | 'ru')
 // instead of plain `string`, which powers the autocomplete you get everywhere.
 export const languages = {
   en: 'English',
   es: 'Español',
+  ru: 'Русский',
 } as const;
 
-export type Lang = keyof typeof languages; // 'en' | 'es'
+export type Lang = keyof typeof languages; // 'en' | 'es' | 'ru'
 export const defaultLang: Lang = 'en';
 
 // The shape every language's chrome strings must satisfy.
@@ -38,7 +39,7 @@ export interface Ui {
     /** Pre-filled text of the SMS */
     smsBody: string;
   };
-  /** aria-label for the EN / ES switcher */
+  /** aria-label for the EN / ES / RU switcher */
   langLabel: string;
   footer: {
     location: string;
@@ -62,7 +63,7 @@ export const ui: Record<Lang, Ui> = {
       close: 'Close',
     },
     cta: {
-      book: 'Book a free 15-min call',
+      book: 'Book a 15-min call',
       talk: "Let's talk",
       sms: 'Text us',
       smsBody: "Hi HaloBits, I'd like to talk about ",
@@ -83,12 +84,33 @@ export const ui: Record<Lang, Ui> = {
       close: 'Cerrar',
     },
     cta: {
-      book: 'Agenda una llamada gratis de 15 min',
+      book: 'Agenda una llamada de 15 min',
       talk: 'Hablemos',
       sms: 'Escríbenos por SMS',
       smsBody: 'Hola HaloBits, quisiera hablar sobre ',
     },
     langLabel: 'Idioma',
     footer: { location: 'Miami, FL', rights: 'HaloBits LLC', privacy: 'Privacidad', terms: 'Términos' },
+  },
+  ru: {
+    nav: {
+      label: 'Главное меню',
+      home: 'Главная',
+      whatWeBuild: 'Что мы делаем',
+      about: 'О нас',
+      faq: 'Вопросы',
+      contact: 'Контакты',
+      talk: 'Давайте поговорим',
+      menu: 'Меню',
+      close: 'Закрыть',
+    },
+    cta: {
+      book: 'Записаться на звонок (15 минут)',
+      talk: 'Давайте поговорим',
+      sms: 'Написать SMS',
+      smsBody: 'Здравствуйте, HaloBits! Хочу поговорить о ',
+    },
+    langLabel: 'Язык',
+    footer: { location: 'Майами, Флорида', rights: 'HaloBits LLC', privacy: 'Конфиденциальность', terms: 'Условия' },
   },
 };

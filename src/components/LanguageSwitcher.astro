@@ -1,5 +1,5 @@
 ---
-// LanguageSwitcher.astro — EN / ES toggle. Just two links (no JavaScript): each
+// LanguageSwitcher.astro — EN / ES / RU toggle. Just two links (no JavaScript): each
 // points at the CURRENT page's twin in the other language, computed by
 // getAlternateUrls. On /about/ it links to /es/about/, and vice-versa.
 // 44px-tall hit areas (tap-target rule); the active language gets a 4px dot.
@@ -11,23 +11,28 @@ const t = useTranslations(lang);
 ---
 
 <div class="lang" role="group" aria-label={t.langLabel}>
-  <a
-    href={alt.en}
-    hreflang="en"
-    data-track="language_switch"
-    lang="en"
-    class:list={['lang-link', { active: lang === 'en' }]}
-    aria-current={lang === 'en' ? 'true' : undefined}>EN<span class="dot" aria-hidden="true"></span></a
-  >
-  <span class="sep" aria-hidden="true">/</span>
-  <a
-    href={alt.es}
-    hreflang="es"
-    data-track="language_switch"
-    lang="es"
-    class:list={['lang-link', { active: lang === 'es' }]}
-    aria-current={lang === 'es' ? 'true' : undefined}>ES<span class="dot" aria-hidden="true"></span></a
-  >
+  {
+    (['en', 'es', 'ru'] as const).map((code, i) => (
+      <>
+        {i > 0 && (
+          <span class="sep" aria-hidden="true">
+            /
+          </span>
+        )}
+        <a
+          href={alt[code]}
+          hreflang={code}
+          data-track="language_switch"
+          lang={code}
+          class:list={['lang-link', { active: lang === code }]}
+          aria-current={lang === code ? 'true' : undefined}
+        >
+          {code.toUpperCase()}
+          <span class="dot" aria-hidden="true" />
+        </a>
+      </>
+    ))
+  }
 </div>
 
 <style>

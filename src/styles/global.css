@@ -34,8 +34,8 @@
   --violet-2:#c9b8de;
 
   /* --- Type --- */
-  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
-  --font-body:    'Geist', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Onest', system-ui, sans-serif;
+  --font-body:    'Geist', 'Onest', system-ui, sans-serif;
 
   /* --- Layout --- */
   --maxw: 1440px;
@@ -183,6 +183,18 @@ textarea:disabled {
 }
 .btn:active {
   transform: scale(0.98);
+}
+/* Long labels (Russian, Spanish) must wrap on phones instead of widening the page. */
+.btn {
+  max-width: 100%;
+}
+@media (max-width: 520px) {
+  .btn {
+    white-space: normal;
+    text-align: left;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
 }
 .btn--sm {
   min-height: 44px;

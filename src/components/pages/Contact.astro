@@ -89,6 +89,7 @@ const i18n = {
             <div class="pills">
               <button type="button" data-pref="en" aria-pressed={lang === 'en' ? 'true' : 'false'}>English</button>
               <button type="button" data-pref="es" aria-pressed={lang === 'es' ? 'true' : 'false'}>Español</button>
+              <button type="button" data-pref="ru" aria-pressed={lang === 'ru' ? 'true' : 'false'}>Русский</button>
             </div>
           </fieldset>
 
@@ -462,7 +463,7 @@ const i18n = {
         business: biz.value.trim(),
         email: isEmail(email.value) ? email.value.trim() : '',
         phone: isPhone(email.value) ? email.value.trim() : '',
-        language: pref === 'es' ? 'Español' : 'English',
+        language: ({ en: 'English', es: 'Español', ru: 'Русский' } as Record<string, string>)[pref] ?? 'English',
         message: msg.value.trim(),
         _gotcha: (form.elements.namedItem('_gotcha') as HTMLInputElement).value,
       };

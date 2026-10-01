@@ -1,6 +1,6 @@
 // =============================================================================
 // cta.ts — the site's two standard actions, so every page says the same thing.
-//   primary   → "Book a free 15-min call" (booking page) — or, until a booking
+//   primary   → "Book a 15-min call" (booking page) — or, until a booking
 //               URL is configured, "Let's talk" → the contact page.
 //   secondary → "Text us" (SMS to the studio phone, pre-filled message).
 // =============================================================================
