@@ -17,8 +17,23 @@
 2. Choose **HTML tag**, copy only the `content="..."` value into `PUBLIC_GSC_VERIFICATION`, redeploy, click Verify. (Or verify via DNS TXT record instead — then the env var is not needed.)
 3. Sitemaps → submit `sitemap-index.xml`. A week later check Pages → the `/`, `/es/` and `/ru/` URLs are indexed.
 
-## 3. Email deliverability for hello@halobits.com (DNS, do at your DNS host)
-- [ ] **SPF**: one TXT record on `halobits.com`: `v=spf1 include:<your mail provider> ~all` (only ONE spf record allowed; include your form-delivery service too if it sends as @halobits.com).
-- [ ] **DKIM**: your mail provider gives a selector + key; publish as TXT/CNAME at `<selector>._domainkey.halobits.com`.
-- [ ] **DMARC**: TXT at `_dmarc.halobits.com`: start with `v=DMARC1; p=none; rua=mailto:hello@halobits.com`, move to `p=quarantine` after a few weeks of clean reports.
-- [ ] **Test**: send an email to the address mail-tester.com gives you; aim for 9–10/10. Also send to a Gmail and an Outlook inbox and check it's not in spam.
+## 3. Send mail from @halobits.com for free (Gmail + Resend)
+Receiving is done by Cloudflare Email Routing (all @halobits.com addresses forward to your Gmail). This section adds *sending*: you write in Gmail, the message goes out "from" hello@halobits.com / angel@halobits.com through Resend's free SMTP (3,000 mails/month, 100/day).
+
+1. **Resend account**: resend.com → sign up → *Domains → Add Domain* → `halobits.com` (region US East). Resend shows DNS records.
+2. **DNS in Cloudflare** (DNS → Records), add exactly what Resend shows. Typically:
+   - `MX  send` → `feedback-smtp.<region>.amazonses.com` (priority 10)
+   - `TXT send` → `v=spf1 include:amazonses.com ~all`  (this SPF lives on the `send` subdomain, so it does NOT conflict with the root SPF that Cloudflare Email Routing created)
+   - `TXT resend._domainkey` → the long DKIM key Resend gives you
+   - Set these records to **DNS only** (grey cloud), not proxied. Click *Verify* in Resend until the domain shows **Verified**.
+3. **DMARC** (one more TXT in Cloudflare): name `_dmarc`, value `v=DMARC1; p=none; rua=mailto:hello@halobits.com`. After a few weeks of clean reports change `p=none` to `p=quarantine`.
+4. **SMTP key**: Resend → *API Keys → Create* (permission: *Sending access*, domain: halobits.com). Copy the key (shown once).
+5. **Gmail → Settings (gear) → See all settings → Accounts and Import → Send mail as → Add another email address**:
+   - Name: `HaloBits` (or your name), Email: `hello@halobits.com`, leave "Treat as an alias" ticked
+   - SMTP server: `smtp.resend.com`, port `465`, SSL; username `resend`, password = the API key
+   - Gmail sends a confirmation code to hello@halobits.com. It arrives in your Gmail through Cloudflare routing: paste the code.
+   - Repeat for `angel@halobits.com` (and any other alias you want to send from).
+   - Optional: in the same screen choose "Reply from the same address the message was sent to".
+6. **Test**: send a mail from hello@halobits.com to mail-tester.com (aim for 9–10/10) and to a Gmail and an Outlook inbox. In Gmail open the message → *Show original*: SPF, DKIM and DMARC should all say PASS.
+
+If a record is rejected or the domain will not verify, check that the `send` records are not proxied and that you copied the values without extra quotes or spaces.
