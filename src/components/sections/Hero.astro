@@ -7,13 +7,16 @@ import hero from '../../assets/hero-computer.jpg';
 import Button from '../ui/Button.astro';
 import Fade from '../ui/Fade.astro';
 import { content } from '../../i18n/content';
-import { localizePath, type Lang } from '../../i18n/utils';
+import { primaryCta, smsCta } from '../../lib/cta';
+import type { Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const c = content[lang].home.hero;
+const main = primaryCta(lang, 'hero');
+const sms = smsCta(lang, 'hero');
 ---
 
 <section class="hero">
@@ -35,13 +38,13 @@ const c = content[lang].home.hero;
     </h1>
     <p class="sub">{c.sub}</p>
     <div class="ctas">
-      <Button href={localizePath('/contact/', lang)} size="sm" track="cta_talk_hero">{c.cta2}</Button>
-      <Button href={localizePath('/what-we-build/', lang)} size="sm" variant="outline" class="ghost" track="cta_build_hero">{c.cta1}</Button>
+      <Button href={main.href} size="sm" external={main.external} track={main.track}>{main.label}</Button>
+      <Button href={sms.href} size="sm" variant="outline" class="ghost" track={sms.track}>{sms.label}</Button>
     </div>
   </div>
 
   <Fade color="#14110F" height="34%" />
-  <div class="wrap cap"><span>Miami, FL</span></div>
+  <div class="wrap cap"><span>Miami, FL · {c.tag}</span></div>
 </section>
 
 <style>

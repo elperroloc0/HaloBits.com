@@ -14,11 +14,13 @@ import hill from '../../assets/miami-hill.jpg';
 import { content } from '../../i18n/content';
 import { SHOW_PLACEHOLDERS } from '../../lib/placeholders';
 import { localizePath, type Lang } from '../../i18n/utils';
+import { primaryCta } from '../../lib/cta';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
+const main = primaryCta(lang, 'about');
 
 // Switches for parts we're not ready to show yet. Markup and copy stay in place;
 // flip a flag to true to bring that part back, nothing else needs to change.
@@ -135,7 +137,7 @@ const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).join('').s
       }
 
       <div class="actions">
-        <Button href={localizePath('/contact/', lang)} size="lg" track="cta_talk_about">{t.cta}</Button>
+        <Button href={main.href} size="lg" external={main.external} track={main.track}>{main.label}</Button>
         <Button href={localizePath('/what-we-build/', lang)} size="lg" variant="outline" track="cta_build_about">{t.cta2}</Button>
       </div>
     </div>

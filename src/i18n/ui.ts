@@ -31,6 +31,13 @@ export interface Ui {
     menu: string;
     close: string;
   };
+  cta: {
+    book: string;
+    talk: string;
+    sms: string;
+    /** Pre-filled text of the SMS */
+    smsBody: string;
+  };
   /** aria-label for the EN / ES switcher */
   langLabel: string;
   footer: {
@@ -54,6 +61,12 @@ export const ui: Record<Lang, Ui> = {
       menu: 'Menu',
       close: 'Close',
     },
+    cta: {
+      book: 'Book a free 15-min call',
+      talk: "Let's talk",
+      sms: 'Text us',
+      smsBody: "Hi HaloBits, I'd like to talk about ",
+    },
     langLabel: 'Language',
     footer: { location: 'Miami, FL', rights: 'HaloBits LLC', privacy: 'Privacy', terms: 'Terms' },
   },
@@ -68,6 +81,12 @@ export const ui: Record<Lang, Ui> = {
       talk: 'Hablemos',
       menu: 'Menú',
       close: 'Cerrar',
+    },
+    cta: {
+      book: 'Agenda una llamada gratis de 15 min',
+      talk: 'Hablemos',
+      sms: 'Escríbenos por SMS',
+      smsBody: 'Hola HaloBits, quisiera hablar sobre ',
     },
     langLabel: 'Idioma',
     footer: { location: 'Miami, FL', rights: 'HaloBits LLC', privacy: 'Privacidad', terms: 'Términos' },

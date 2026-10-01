@@ -1,0 +1,68 @@
+---
+// Problems.astro — the "sound familiar?" strip right under the hero. Three short,
+// concrete pains, each taken from a real project (missed calls → AI Concierge,
+// "where is the van?" → Van Tracker, receipts → Receipt Scanner).
+import { content } from '../../i18n/content';
+import type { Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = content[lang].home.problems;
+---
+
+<section class="problems">
+  <div class="wrap">
+    <h2 class="display">{c.title}</h2>
+    <ul class="list">
+      {
+        c.items.map((p) => (
+          <li>
+            <h3>{p.t}</h3>
+            <p>{p.b}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .problems {
+    background: var(--ink);
+    color: var(--cream);
+    padding: clamp(48px, 6vw, 96px) 0 clamp(8px, 2vw, 24px);
+  }
+  h2 {
+    font-size: clamp(1.8rem, 3.4vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    max-width: 18ch;
+  }
+  .list {
+    list-style: none;
+    margin: clamp(28px, 4vw, 48px) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 28px clamp(24px, 4vw, 64px);
+  }
+  li {
+    border-top: 1px solid rgba(239, 230, 214, 0.2);
+    padding-top: 18px;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  p {
+    margin-top: 10px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--soft);
+  }
+</style>

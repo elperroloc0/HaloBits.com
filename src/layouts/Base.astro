@@ -187,7 +187,7 @@ const jsonLd = {
   // Conversion tracking. One delegated listener for every link on the page.
   // Event names (all carry a `location` property: nav, hero, footer, ...):
   //   cta_click               buttons marked data-track="cta_*"
-  //   phone_click / whatsapp_click / calendar_click / email_click   by href
+  //   phone_click / sms_click / whatsapp_click / calendar_click / email_click   by href
   //   outbound_concierge_click   links to concierge.halobits.com
   //   language_switch          the EN / ES toggle
   // Custom events need a Vercel plan that includes them; otherwise ignored.
@@ -197,6 +197,7 @@ const jsonLd = {
     const href = a.getAttribute('href') ?? '';
     const tag = a.dataset.track ?? '';
     if (href.startsWith('tel:')) return 'phone_click';
+    if (href.startsWith('sms:')) return 'sms_click';
     if (href.startsWith('mailto:')) return 'email_click';
     if (/^https?:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) return 'whatsapp_click';
     if (/^https?:\/\/([^/]*\.)?(cal\.com|calendly\.com)\//.test(href) || tag === 'calendar_click') return 'calendar_click';

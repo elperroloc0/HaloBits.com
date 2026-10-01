@@ -69,7 +69,20 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
                     <span class="for">{p.for}</span>
                   </p>
                   <h2 class="display name">{p.name}</h2>
-                  <p class="desc">{p.desc}</p>
+                  <div class="block">
+                    <p class="eyebrow label">{t.problemLabel}</p>
+                    <p class="who">{p.problem}</p>
+                  </div>
+                  <div class="block">
+                    <p class="eyebrow label">{t.builtLabel}</p>
+                    <p class="who">{p.desc}</p>
+                  </div>
+                  {p.result && (
+                    <div class="block">
+                      <p class="eyebrow label">{t.resultLabel}</p>
+                      <p class="who">{p.result}</p>
+                    </div>
+                  )}
 
                   {p.includes && (
                     <div class="block">

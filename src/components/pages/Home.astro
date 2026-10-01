@@ -6,8 +6,10 @@
 import Base from '../../layouts/Base.astro';
 import Band from '../ui/Band.astro';
 import Hero from '../sections/Hero.astro';
+import Problems from '../sections/Problems.astro';
 import WhatWeBuild from '../sections/WhatWeBuild.astro';
 import HowWePartner from '../sections/HowWePartner.astro';
+import Pricing from '../sections/Pricing.astro';
 import CTA from '../sections/CTA.astro';
 import { content } from '../../i18n/content';
 import type { Lang } from '../../i18n/utils';
@@ -21,9 +23,11 @@ const meta = content[lang].meta.home;
 
 <Base lang={lang} title={meta.title} description={meta.description} current="home">
   <Hero lang={lang} />
+  <Problems lang={lang} />
   <WhatWeBuild lang={lang} />
   <Band from="#14110F" to="#EFE6D6" />
   <HowWePartner lang={lang} />
+  <Pricing lang={lang} />
   <Band from="#EFE6D6" to="#14110F" />
   <CTA lang={lang} />
 </Base>

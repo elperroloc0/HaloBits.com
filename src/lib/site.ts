@@ -15,4 +15,8 @@ export const SITE = {
   country: 'US',
 } as const;
 
+/** Online booking page (Cal.com, Calendly, Google Appointments…). Set PUBLIC_BOOKING_URL
+ *  in Vercel/.env. While empty, the "book a call" button falls back to the contact page. */
+export const BOOKING_URL: string = import.meta.env.PUBLIC_BOOKING_URL ?? '';
+
 export const telHref = `tel:${SITE.phone}`;

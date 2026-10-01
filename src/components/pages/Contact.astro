@@ -12,6 +12,8 @@ import Base from '../../layouts/Base.astro';
 import sun from '../../assets/contact-sun.png';
 import { content } from '../../i18n/content';
 import type { Lang } from '../../i18n/utils';
+import { primaryCta, smsCta } from '../../lib/cta';
+import { SITE, telHref } from '../../lib/site';
 
 interface Props {
   lang: Lang;
@@ -19,6 +21,8 @@ interface Props {
 const { lang } = Astro.props;
 const t = content[lang].contact;
 const meta = content[lang].meta.contact;
+const book = primaryCta(lang, 'contact');
+const sms = smsCta(lang, 'contact');
 const endpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '';
 
 // Strings the client script needs (it can't import content.ts), as inert JSON.
@@ -47,6 +51,16 @@ const i18n = {
       <div class="col">
         <h1>{t.title}</h1>
 
+        <!-- Fast options first: one tap on a phone. -->
+        <div class="quick">
+          <p class="quick-title">{t.quickTitle}</p>
+          <div class="quick-row">
+            <a class="qbtn" href={sms.href} data-track={sms.track}>{sms.label}</a>
+            {book.external && <a class="qbtn" href={book.href} target="_blank" rel="noopener noreferrer" data-track={book.track}>{book.label}</a>}
+            <a class="qlink" href={telHref}>{SITE.phoneDisplay}</a>
+          </div>
+        </div>
+
         <div id="sent" class="sent" role="status" hidden>
           <p class="sent-title" id="sent-title"></p>
           <p class="sent-body" id="sent-body"></p>
@@ -62,13 +76,13 @@ const i18n = {
             </div>
             <div class="field">
               <label for="c-biz">{t.biz} <span class="opt">{t.optional}</span></label>
-              <input id="c-biz" name="business" autocomplete="organization" placeholder={t.bizPh} />
+              <input id="c-biz" name="business" autocomplete="organization" />
             </div>
           </div>
 
           <div class="field">
             <label for="c-email">{t.email}</label>
-            <input id="c-email" name="email" type="email" autocomplete="email" inputmode="email" aria-describedby="c-email-e" />
+            <input id="c-email" name="contact" autocomplete="email" aria-describedby="c-email-e" />
             <p id="c-email-e" class="err"></p>
           </div>
 
@@ -82,7 +96,7 @@ const i18n = {
 
           <div class="field">
             <label for="c-msg">{t.msg}</label>
-            <textarea id="c-msg" name="message" rows="5" placeholder={t.msgPh} aria-describedby="c-msg-e"></textarea>
+            <textarea id="c-msg" name="message" rows="5" aria-describedby="c-msg-e"></textarea>
             <p id="c-msg-e" class="err"></p>
           </div>
 
@@ -155,6 +169,38 @@ const i18n = {
     line-height: 0.94;
     letter-spacing: -0.045em;
     text-wrap: balance;
+  }
+  .quick {
+    margin-top: 28px;
+    margin-bottom: clamp(24px, 3vw, 36px);
+  }
+  .quick-title {
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .quick-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+  }
+  .qbtn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--cream);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .qlink {
+    padding: 12px 4px;
+    font-weight: 500;
+    text-underline-offset: 5px;
   }
   form {
     margin-top: 40px;
@@ -371,10 +417,14 @@ const i18n = {
     const pills = form.querySelectorAll<HTMLButtonElement>('[data-pref]');
     let pref = form.dataset.lang ?? 'en';
 
+    // The field takes an email OR a phone number (7+ digits).
+    const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+    const isPhone = (v: string) => /^[+()\d\s.-]+$/.test(v.trim()) && v.replace(/\D/g, '').length >= 7;
+
     // --- validation (rules from the design) --------------------------------
     const rules = [
       { el: name, err: 'c-name-e', text: t.errName, bad: () => !name.value.trim() },
-      { el: email, err: 'c-email-e', text: t.errEmail, bad: () => !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim()) },
+      { el: email, err: 'c-email-e', text: t.errEmail, bad: () => !isEmail(email.value) && !isPhone(email.value) },
       { el: msg, err: 'c-msg-e', text: t.errMsg, bad: () => msg.value.trim().length < 8 },
     ];
     const show = (r: (typeof rules)[number], bad: boolean) => {
@@ -417,7 +467,8 @@ const i18n = {
       const data = {
         name: name.value.trim(),
         business: biz.value.trim(),
-        email: email.value.trim(),
+        email: isEmail(email.value) ? email.value.trim() : '',
+        phone: isPhone(email.value) ? email.value.trim() : '',
         language: pref === 'es' ? 'Español' : 'English',
         message: msg.value.trim(),
         _gotcha: (form.elements.namedItem('_gotcha') as HTMLInputElement).value,
@@ -427,7 +478,7 @@ const i18n = {
 
       if (!endpoint) {
         // No backend configured: hand the message to the visitor's email app.
-        const body = `${data.message}\n\n— ${data.name}${data.business ? ` · ${data.business}` : ''}\n${data.email}\nReply: ${data.language}`;
+        const body = `${data.message}\n\n— ${data.name}${data.business ? ` · ${data.business}` : ''}\n${email.value.trim()}\nReply: ${data.language}`;
         window.location.href = `mailto:hello@halobits.com?subject=${encodeURIComponent(t.subject)}&body=${encodeURIComponent(body)}`;
         return done(t.mailTitle, t.mailBody);
       }

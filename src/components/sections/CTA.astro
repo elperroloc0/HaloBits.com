@@ -7,13 +7,16 @@ import sea from '../../assets/sea-sky.jpg';
 import Button from '../ui/Button.astro';
 import Fade from '../ui/Fade.astro';
 import { content } from '../../i18n/content';
-import { localizePath, type Lang } from '../../i18n/utils';
+import type { Lang } from '../../i18n/utils';
+import { primaryCta, smsCta } from '../../lib/cta';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const c = content[lang].home.cta;
+const main = primaryCta(lang, 'closing');
+const sms = smsCta(lang, 'closing');
 ---
 
 <section class="cta">
@@ -24,8 +27,8 @@ const c = content[lang].home.cta;
     <h2 class="display">{c.title}</h2>
     <p class="body">{c.body}</p>
     <div class="actions">
-      <Button href={localizePath('/contact/', lang)} size="lg" track="cta_talk_closing">{c.btn}</Button>
-      <a href={localizePath('/what-we-build/', lang)} class="tlink tlink--lg">{c.alt2}</a>
+      <Button href={main.href} size="lg" external={main.external} track={main.track}>{main.label}</Button>
+      <Button href={sms.href} size="lg" variant="outline" track={sms.track}>{sms.label}</Button>
     </div>
   </div>
 </section>

@@ -39,7 +39,12 @@ interface Project {
   id: string;
   name: string;
   for: string;
+  /** The pain, in one or two sentences (real, from the client's own words). */
+  problem: string;
+  /** What we built. */
   desc: string;
+  /** Measured result. Leave out until there is a real, approved number. */
+  result?: string;
   includes?: string[];
   /** Real numbers only (shown big, in butter). Leave out until you have them. */
   stats?: Array<{ v: string; l: string }>;
@@ -73,7 +78,14 @@ export interface SiteContent {
     notFound: Meta;
   };
   home: {
-    hero: { l1: string; l2: string; sub: string; cta1: string; cta2: string; alt: string };
+    hero: { l1: string; l2: string; tag: string; sub: string; alt: string };
+    problems: { title: string; items: Array<{ t: string; b: string }> };
+    pricing: {
+      title: string;
+      lead: string;
+      items: Array<{ t: string; p: string; b: string }>;
+      foot: string;
+    };
     build: { title: string; all: string; items: Product[]; note: string };
     partner: {
       title: string;
@@ -103,6 +115,9 @@ export interface SiteContent {
     projectsLabel: string;
     includes: string;
     who: string;
+    problemLabel: string;
+    builtLabel: string;
+    resultLabel: string;
     projects: Project[];
     servicesPanel: {
       lead: string;
@@ -127,16 +142,15 @@ export interface SiteContent {
     name: string;
     biz: string;
     optional: string;
-    bizPh: string;
     email: string;
     pref: string;
     msg: string;
-    msgPh: string;
     send: string;
     sending: string;
     errName: string;
     errEmail: string;
     errMsg: string;
+    quickTitle: string;
     errSend: string;
     sentTitle: string;
     sentBody: string;
@@ -155,9 +169,9 @@ export const content: Record<Lang, SiteContent> = {
   en: {
     meta: {
       home: {
-        title: 'HaloBits — Not a service. A partner.',
+        title: 'HaloBits — Custom software and websites for small businesses in Miami',
         description:
-          'A Miami studio building calm software for small businesses, in English and Spanish, and staying on after launch to run it with you.',
+          'Websites, automation and custom software for small businesses. Built in Miami, in English and Spanish. First version in 2 weeks to a month, then month to month. From $100.',
       },
       whatWeBuild: {
         title: 'What we build — HaloBits',
@@ -167,11 +181,11 @@ export const content: Record<Lang, SiteContent> = {
       about: {
         title: 'About — HaloBits',
         description:
-          'HaloBits is a small Miami software studio. We build custom tools for small and mid-sized businesses, and stay to run them with you.',
+          'HaloBits is a small Miami software studio. We build custom tools and websites for small businesses, and stay to run them with you.',
       },
       contact: {
         title: 'Contact — HaloBits',
-        description: "Tell us what eats your day. Let's see what we can build together.",
+        description: 'Tell us what eats your day. Text us, book a free call or send a message. We answer in English or Spanish.',
       },
       faq: {
         title: 'FAQ — HaloBits',
@@ -183,21 +197,28 @@ export const content: Record<Lang, SiteContent> = {
 
     home: {
       hero: {
-        l1: 'Not a service.',
-        l2: 'A partner.',
-        sub: 'We build calm software for Miami small businesses, in English and Spanish, and we stay on after launch to run it with you.',
-        cta1: 'See what we build',
-        cta2: "Let's talk",
+        l1: 'The repetitive work,',
+        l2: 'off your plate.',
+        tag: 'Not a service. A partner.',
+        sub: 'Custom software, automation and websites for small businesses. Built in Miami, in English and Spanish. A first version in 2 weeks to a month, then we run it with you. Month to month, cancel anytime.',
         alt: 'Painting of an old computer on a grassy hill above the sea, with the Miami skyline and a large orange sun.',
       },
+      problems: {
+        title: 'The work that keeps coming back.',
+        items: [
+          { t: 'The phone rings and nobody can pick up.', b: 'Every missed call is a customer who may go somewhere else.' },
+          { t: '“Where is the van?”', b: 'The same question to the front desk, every afternoon.' },
+          { t: 'Receipts pile up.', b: 'Paper to chase and sort before the accountant can use any of it.' },
+        ],
+      },
       build: {
-        title: 'Tools we built for one business, ready for yours.',
+        title: 'Work we have built, for businesses like yours.',
         all: 'See what we build',
         items: [
           {
             name: 'AI Concierge',
-            for: 'Built for restaurants in Miami',
-            line: 'Every call answered, in English or Spanish.',
+            for: 'Built for a restaurant in Miami',
+            line: 'Answers calls in English or Spanish.',
             href: '/what-we-build/#concierge',
           },
           {
@@ -213,25 +234,36 @@ export const content: Record<Lang, SiteContent> = {
             href: '/what-we-build/#receipts',
           },
         ],
-        note: 'These are examples. Most of our work is custom, built around one business at a time.',
+        note: 'Most of our work is custom, built around one business at a time.',
       },
       partner: {
         title: 'We stay after launch.',
-        lead: 'Discovery and building take weeks. Running it together is month to month, for as long as it helps.',
-        s1c: 'First conversation',
+        lead: 'Discovery and building take 2 weeks to a month, depending on size. Running it together is month to month, for as long as it helps.',
+        s1c: 'Free first conversation',
         s1t: 'Discovery',
-        s1b: 'We sit with your team, learn the workflow and find the work worth automating. No jargon, no fixed menu.',
+        s1b: 'We sit with your team, learn the workflow and find the work worth automating. It is free. You leave knowing what we would build and what it costs.',
         s2c: 'First version live',
         s2t: 'Build',
-        s2b: 'We ship a first version in weeks, put it in front of your real day and refine it with you.',
+        s2b: 'In 2 weeks to a month you get a working first version. You use it in your real day and we refine it with you.',
         s3c: 'Every month after',
         s3t: 'Run it together',
         s3b: 'We watch it, fix what breaks, usually the same day, and change it as your business changes.',
         month: 'Month',
         m: 'M',
       },
+      pricing: {
+        title: 'Simple prices. No contract.',
+        lead: 'Month to month, cancel anytime. The first conversation is free.',
+        items: [
+          { t: 'Landing page', p: 'From $100', b: 'One clear page that says what you do and how to reach you.' },
+          { t: 'Website with more inside', p: 'From $500', b: 'Bookings, logins, payments, a back end. Whatever the site needs to do.' },
+          { t: 'Software and automation', p: 'From $200', b: 'Tools that take repetitive work off your plate: calls, reports, receipts, reminders.' },
+          { t: 'Running it together', p: 'About $100 a month', b: 'We watch it, fix what breaks and change it as your business changes.' },
+        ],
+        foot: 'A first version takes 2 weeks to a month, depending on size. You get a price after the first conversation.',
+      },
       cta: {
-        title: "Let's build something that earns its keep.",
+        title: "Let's build something together.",
         body: 'Bring us the task that keeps coming back. The first conversation is free, in English or Spanish.',
         btn: 'Start a conversation',
         alt2: 'Browse what we already offer',
@@ -241,19 +273,23 @@ export const content: Record<Lang, SiteContent> = {
 
     buildPage: {
       title: 'We take the routine, you take the joy.',
-      lead: 'Each of these started with one business and one problem that kept eating the day.',
+      lead: 'Each of these started with one business and one problem that kept eating the day. Most of our work is custom.',
       modeLabel: 'Show',
       products: 'Products',
       services: 'Services',
       projectsLabel: 'Projects',
       includes: 'Includes',
       who: "Who it's for",
+      problemLabel: 'The problem',
+      builtLabel: 'What we built',
+      resultLabel: 'Result',
       projects: [
         {
           id: 'concierge',
           name: 'AI Concierge',
-          for: 'Built for restaurants in Miami',
-          desc: 'Stop losing guests to voicemail. Every call is answered in English or Spanish, reservation requests are taken and sent to you, and you see what callers ask and when you are busiest.',
+          for: 'Built for a restaurant in Miami',
+          problem: 'The owner could not answer every call. Missed calls meant lost guests, and callers who got no answer were frustrated.',
+          desc: 'An AI receptionist that answers calls in English or Spanish, takes reservation requests and sends them to the owner, and shows what callers ask and when the restaurant is busiest.',
           includes: [
             'Reservation requests with date, time and party size, sent to you to confirm',
             'Answers about hours, menu, parking and events, from your own information',
@@ -261,10 +297,8 @@ export const content: Record<Lang, SiteContent> = {
             'Passes the call to you or a manager when it needs a person',
             'Alerts for complaints and bookings, a daily summary and a weekly report',
           ],
-          statsCaption: 'Live at a restaurant in Miami',
-          stats: [{ v: '~400', l: 'minutes of calls a month' }],
           who: "The owner who's on the floor at 8 pm while the phone keeps ringing.",
-          cta: { label: 'Get AI Concierge', href: 'https://concierge.halobits.com', external: true },
+          cta: { label: 'Want something like this? Let’s talk', href: '/contact/' },
           media: {
             shape: 'wide',
             ph: 'Screenshot · AI Concierge owner portal, daily report · 16:9',
@@ -275,9 +309,10 @@ export const content: Record<Lang, SiteContent> = {
           id: 'van',
           name: 'Van Tracker',
           for: 'Built for a gymnastics center',
+          problem: 'The same “where is the van?” call to the front desk, every afternoon.',
           desc: "Parents get a message when the van arrives, and a live map of only their child's ride. No calls to the front desk, no guessing.",
           who: 'Any business that drives kids, patients or crews and gets the same “where are they?” call every afternoon.',
-          cta: { label: 'Ask about it', href: '/contact/' },
+          cta: { label: 'Want something like this? Let’s talk', href: '/contact/' },
           media: {
             shape: 'phone',
             ph: "Screenshot · Parent's phone, arrival message and live map · 9:19",
@@ -288,9 +323,10 @@ export const content: Record<Lang, SiteContent> = {
           id: 'receipts',
           name: 'Receipt Scanner',
           for: 'Built for the inventory lead at a residential business',
+          problem: 'Chasing paper receipts every week to keep the inventory and the books straight.',
           desc: 'Snap a receipt, get clean line items and a spreadsheet your accountant can use.',
           who: 'The person who keeps the inventory at a residential business and chases receipts every week.',
-          cta: { label: 'Ask about it', href: '/contact/' },
+          cta: { label: 'Want something like this? Let’s talk', href: '/contact/' },
           media: {
             shape: 'phone',
             ph: 'Screenshot · Receipt scan screen on a phone · 9:19',
@@ -311,10 +347,10 @@ export const content: Record<Lang, SiteContent> = {
     },
 
     about: {
-      title: 'We make software that earns its keep.',
+      title: 'Software that makes your day easier.',
       alt: 'Painting of a grassy hill above the sea at golden hour, with palm trees and the Miami skyline in the distance.',
       essential:
-        'HaloBits is a software studio in Miami. We build custom tools for small and mid-sized businesses, the kind of capability big companies always had, now within reach of the ones that were priced out. We design it, build it, and stay to run it with you.',
+        'HaloBits is a software studio in Miami. We build custom tools and websites for small businesses, the kind of capability big companies always had, now within reach of the ones that were priced out. We design it, build it, and stay to run it with you.',
       details: [
         {
           t: 'What we do',
@@ -403,16 +439,15 @@ export const content: Record<Lang, SiteContent> = {
       name: 'Your name',
       biz: 'Business',
       optional: '(optional)',
-      bizPh: 'Restaurant in Little Havana',
-      email: 'Email',
+      email: 'Email or phone',
       pref: 'Language for our reply',
-      msg: 'What takes up your time?',
-      msgPh: 'We miss calls during the dinner rush and...',
+      msg: 'What task keeps coming back?',
       send: 'Send message',
       sending: 'Sending…',
       errName: 'Tell us what to call you.',
-      errEmail: 'Add a full email so we can write back.',
+      errEmail: 'Add an email or a phone number so we can reply.',
       errMsg: 'A sentence or two about the problem helps us reply.',
+      quickTitle: 'Prefer something faster?',
       errSend: 'Something went wrong sending that. Please email us at hello@halobits.com.',
       sentTitle: 'Thanks, it’s on its way.',
       sentBody: 'We read every message ourselves and will reply from hello@halobits.com in the language you picked.',
@@ -434,9 +469,9 @@ export const content: Record<Lang, SiteContent> = {
   es: {
     meta: {
       home: {
-        title: 'HaloBits — No es un servicio. Es un socio.',
+        title: 'HaloBits — Software y sitios web a la medida para negocios pequeños en Miami',
         description:
-          'Un estudio de Miami que hace software tranquilo para pequeños negocios, en inglés y en español, y se queda después del lanzamiento para manejarlo contigo.',
+          'Sitios web, automatización y software a la medida para negocios pequeños. Hecho en Miami, en inglés y en español. Primera versión en 2 semanas a un mes, después mes a mes. Desde $100.',
       },
       whatWeBuild: {
         title: 'Qué hacemos — HaloBits',
@@ -446,11 +481,11 @@ export const content: Record<Lang, SiteContent> = {
       about: {
         title: 'Nosotros — HaloBits',
         description:
-          'HaloBits es un pequeño estudio de software en Miami. Hacemos herramientas a la medida para negocios pequeños y medianos, y nos quedamos para operarlas contigo.',
+          'HaloBits es un pequeño estudio de software en Miami. Hacemos herramientas y sitios web a la medida para negocios pequeños, y nos quedamos para operarlos contigo.',
       },
       contact: {
         title: 'Contacto — HaloBits',
-        description: 'Cuéntanos qué te consume el día. Veamos qué podemos construir juntos.',
+        description: 'Cuéntanos qué te quita tiempo. Escríbenos por SMS, agenda una llamada gratis o manda un mensaje. Respondemos en inglés o en español.',
       },
       faq: {
         title: 'Preguntas frecuentes — HaloBits',
@@ -462,21 +497,28 @@ export const content: Record<Lang, SiteContent> = {
 
     home: {
       hero: {
-        l1: 'No es un servicio.',
-        l2: 'Es un socio.',
-        sub: 'Hacemos software tranquilo para negocios pequeños de Miami, en inglés y en español, y después del lanzamiento seguimos ahí, manejándolo contigo.',
-        cta1: 'Mira lo que hacemos',
-        cta2: 'Hablemos',
+        l1: 'Quítate de encima',
+        l2: 'el trabajo repetitivo.',
+        tag: 'No es un servicio. Es un socio.',
+        sub: 'Software a la medida, automatización y sitios web para negocios pequeños. Hecho en Miami, en inglés y en español. Una primera versión en 2 semanas a un mes, y después lo manejamos contigo. Mes a mes, cancelas cuando quieras.',
         alt: 'Pintura de una computadora antigua sobre una loma frente al mar, con el skyline de Miami y un gran sol naranja.',
       },
+      problems: {
+        title: 'El trabajo que siempre vuelve.',
+        items: [
+          { t: 'Suena el teléfono y nadie puede contestar.', b: 'Cada llamada perdida es un cliente que puede irse a otro lado.' },
+          { t: '“¿Dónde está la van?”', b: 'La misma pregunta a la recepción, todas las tardes.' },
+          { t: 'Los recibos se acumulan.', b: 'Papeles que perseguir y ordenar antes de que tu contador pueda usarlos.' },
+        ],
+      },
       build: {
-        title: 'Herramientas que hicimos para un negocio, listas para el tuyo.',
+        title: 'Trabajos que hicimos, para negocios como el tuyo.',
         all: 'Mira lo que hacemos',
         items: [
           {
             name: 'AI Concierge',
-            for: 'Hecho para restaurantes de Miami',
-            line: 'Cada llamada contestada, en inglés o en español.',
+            for: 'Hecho para un restaurante de Miami',
+            line: 'Contesta llamadas en inglés o en español.',
             href: '/what-we-build/#concierge',
           },
           {
@@ -492,25 +534,36 @@ export const content: Record<Lang, SiteContent> = {
             href: '/what-we-build/#receipts',
           },
         ],
-        note: 'Estos son ejemplos. Casi todo lo que hacemos es a la medida, pensado para un negocio a la vez.',
+        note: 'Casi todo lo que hacemos es a la medida, pensado para un negocio a la vez.',
       },
       partner: {
         title: 'Nos quedamos después del lanzamiento.',
-        lead: 'Descubrir y construir toma semanas. Operarlo juntos va mes a mes, mientras te sirva.',
-        s1c: 'Primera conversación',
+        lead: 'Descubrir y construir toma de 2 semanas a un mes, según el tamaño. Operarlo juntos va mes a mes, mientras te sirva.',
+        s1c: 'Primera conversación gratis',
         s1t: 'Descubrimiento',
-        s1b: 'Nos sentamos con tu equipo, aprendemos cómo trabajan y encontramos lo que vale la pena automatizar. Sin jerga y sin menú fijo.',
+        s1b: 'Nos sentamos con tu equipo, aprendemos cómo trabajan y encontramos lo que vale la pena automatizar. Es gratis. Sales sabiendo qué haríamos y cuánto cuesta.',
         s2c: 'Primera versión en vivo',
         s2t: 'Construcción',
-        s2b: 'Lanzamos una primera versión en semanas, la ponemos a trabajar en tu día real y la ajustamos contigo.',
+        s2b: 'En 2 semanas a un mes tienes una primera versión funcionando. La usas en tu día a día y la ajustamos contigo.',
         s3c: 'Cada mes después',
         s3t: 'Lo operamos juntos',
         s3b: 'La vigilamos, arreglamos lo que falle, casi siempre el mismo día, y la vamos cambiando a medida que cambia tu negocio.',
         month: 'Mes',
         m: 'M',
       },
+      pricing: {
+        title: 'Precios claros. Sin contrato.',
+        lead: 'Mes a mes, cancelas cuando quieras. La primera conversación es gratis.',
+        items: [
+          { t: 'Página de aterrizaje', p: 'Desde $100', b: 'Una página clara que dice qué haces y cómo contactarte.' },
+          { t: 'Sitio web con más funciones', p: 'Desde $500', b: 'Reservas, cuentas de usuario, pagos, un back end. Lo que tu sitio necesite hacer.' },
+          { t: 'Software y automatización', p: 'Desde $200', b: 'Herramientas que te quitan el trabajo repetitivo: llamadas, reportes, recibos, recordatorios.' },
+          { t: 'Lo operamos juntos', p: 'Unos $100 al mes', b: 'La vigilamos, arreglamos lo que falle y la cambiamos a medida que cambia tu negocio.' },
+        ],
+        foot: 'La primera versión toma de 2 semanas a un mes, según el tamaño. Después de la primera conversación te damos un precio.',
+      },
       cta: {
-        title: 'Construyamos algo que se gane su lugar.',
+        title: 'Construyamos algo juntos.',
         body: 'Tráenos la tarea que siempre vuelve. La primera conversación es gratis, en inglés o en español.',
         btn: 'Empezar a hablar',
         alt2: 'Mira lo que ya ofrecemos',
@@ -520,19 +573,23 @@ export const content: Record<Lang, SiteContent> = {
 
     buildPage: {
       title: 'Nosotros la rutina, tú el placer.',
-      lead: 'Cada una de estas empezó con un negocio y un problema que le consumía el día.',
+      lead: 'Cada una de estas empezó con un negocio y un problema que le quitaba el día. Casi todo nuestro trabajo es a la medida.',
       modeLabel: 'Mostrar',
       products: 'Productos',
       services: 'Servicios',
       projectsLabel: 'Proyectos',
       includes: 'Incluye',
       who: 'Para quién',
+      problemLabel: 'El problema',
+      builtLabel: 'Lo que hicimos',
+      resultLabel: 'Resultado',
       projects: [
         {
           id: 'concierge',
           name: 'AI Concierge',
-          for: 'Hecho para restaurantes de Miami',
-          desc: 'Deja de perder clientes por el buzón de voz. Cada llamada se contesta en inglés o en español, las solicitudes de reserva te llegan listas y ves qué preguntan tus clientes y cuándo tienes más movimiento.',
+          for: 'Hecho para un restaurante de Miami',
+          problem: 'El dueño no podía contestar todas las llamadas. Las llamadas perdidas eran clientes perdidos, y quienes no recibían respuesta se molestaban.',
+          desc: 'Una recepcionista con IA que contesta llamadas en inglés o en español, toma solicitudes de reserva y se las envía al dueño, y muestra qué preguntan los clientes y cuándo hay más movimiento.',
           includes: [
             'Solicitudes de reserva con fecha, hora y número de personas, para que tú las confirmes',
             'Respuestas sobre horario, menú, estacionamiento y eventos, con tu propia información',
@@ -540,10 +597,8 @@ export const content: Record<Lang, SiteContent> = {
             'Te pasa la llamada a ti o a un gerente cuando hace falta una persona',
             'Avisos de quejas y reservas, un resumen diario y un reporte semanal',
           ],
-          statsCaption: 'En vivo en un restaurante de Miami',
-          stats: [{ v: '~400', l: 'minutos de llamadas al mes' }],
           who: 'El dueño que está en el salón a las 8 de la noche mientras el teléfono no para de sonar.',
-          cta: { label: 'Consigue AI Concierge', href: 'https://concierge.halobits.com', external: true },
+          cta: { label: '¿Quieres algo así? Hablemos', href: '/contact/' },
           media: {
             shape: 'wide',
             ph: 'Captura · Portal del dueño de AI Concierge, reporte diario · 16:9',
@@ -554,9 +609,10 @@ export const content: Record<Lang, SiteContent> = {
           id: 'van',
           name: 'Van Tracker',
           for: 'Hecho para un centro de gimnasia',
+          problem: 'La misma llamada a la recepción, todas las tardes: «¿dónde está la van?».',
           desc: 'Los padres reciben un mensaje cuando llega la van, y un mapa en vivo solo del recorrido de su hijo. Sin llamadas a la recepción, sin adivinar.',
           who: 'Cualquier negocio que transporta niños, pacientes o equipos y recibe la misma llamada de “¿por dónde vienen?” todas las tardes.',
-          cta: { label: 'Pregunta por esto', href: '/contact/' },
+          cta: { label: '¿Quieres algo así? Hablemos', href: '/contact/' },
           media: {
             shape: 'phone',
             ph: 'Captura · Teléfono de un padre, aviso de llegada y mapa en vivo · 9:19',
@@ -567,9 +623,10 @@ export const content: Record<Lang, SiteContent> = {
           id: 'receipts',
           name: 'Receipt Scanner',
           for: 'Hecho para quien lleva el inventario en un negocio residencial',
+          problem: 'Perseguir recibos de papel cada semana para tener el inventario y las cuentas en orden.',
           desc: 'Tómale una foto al recibo y obtén cada línea limpia y una hoja de cálculo que tu contador sí puede usar.',
           who: 'Quien lleva el inventario en un negocio residencial y persigue recibos todas las semanas.',
-          cta: { label: 'Pregunta por esto', href: '/contact/' },
+          cta: { label: '¿Quieres algo así? Hablemos', href: '/contact/' },
           media: {
             shape: 'phone',
             ph: 'Captura · Pantalla de escaneo de recibos en el teléfono · 9:19',
@@ -590,10 +647,10 @@ export const content: Record<Lang, SiteContent> = {
     },
 
     about: {
-      title: 'Hacemos software que se gana su lugar.',
+      title: 'Software que te hace el día más fácil.',
       alt: 'Pintura de una loma frente al mar al atardecer, con palmas y el skyline de Miami a lo lejos.',
       essential:
-        'HaloBits es un estudio de software en Miami. Hacemos herramientas a la medida para negocios pequeños y medianos, la capacidad que las grandes empresas siempre tuvieron, ahora al alcance de quienes quedaban fuera por el precio. Lo diseñamos, lo construimos y nos quedamos para operarlo contigo.',
+        'HaloBits es un estudio de software en Miami. Hacemos herramientas y sitios web a la medida para negocios pequeños, la capacidad que las grandes empresas siempre tuvieron, ahora al alcance de quienes quedaban fuera por el precio. Lo diseñamos, lo construimos y nos quedamos para operarlo contigo.',
       details: [
         {
           t: 'Qué hacemos',
@@ -682,16 +739,15 @@ export const content: Record<Lang, SiteContent> = {
       name: 'Tu nombre',
       biz: 'Negocio',
       optional: '(opcional)',
-      bizPh: 'Restaurante en la Pequeña Habana',
-      email: 'Email',
+      email: 'Email o teléfono',
       pref: 'Idioma para responderte',
-      msg: '¿Qué te quita más tiempo?',
-      msgPh: 'Se nos pierden llamadas en la hora pico de la cena y...',
+      msg: '¿Qué tarea te sigue quitando tiempo?',
       send: 'Enviar mensaje',
       sending: 'Enviando…',
       errName: 'Dinos cómo te llamas.',
-      errEmail: 'Escribe un email completo para poder responderte.',
+      errEmail: 'Escribe un email o un teléfono para poder responderte.',
       errMsg: 'Una o dos frases sobre el problema nos ayudan a responder.',
+      quickTitle: '¿Prefieres algo más rápido?',
       errSend: 'No pudimos enviarlo. Escríbenos a hello@halobits.com.',
       sentTitle: 'Gracias, ya va en camino.',
       sentBody: 'Leemos cada mensaje nosotros mismos y te responderemos desde hello@halobits.com en el idioma que elegiste.',
