@@ -38,8 +38,8 @@ const {
 
 // Preview deployments are never indexed; production only when the page asks.
 const hideFromSearch = noindex || IS_PREVIEW;
-// Search Console: paste the token from "HTML tag" verification into PUBLIC_GSC_VERIFICATION.
-const gscToken = import.meta.env.PUBLIC_GSC_VERIFICATION;
+// Search Console "HTML tag" verification token (public by design). Override with PUBLIC_GSC_VERIFICATION.
+const gscToken = import.meta.env.PUBLIC_GSC_VERIFICATION ?? 'ra0y_ojmtD6iOqjGe4qT6s0zdQIYQlgCzi22vRstxwY';
 
 const alt = getAlternateUrls(Astro.url);
 const canonicalURL = new URL(alt[lang], Astro.site);
