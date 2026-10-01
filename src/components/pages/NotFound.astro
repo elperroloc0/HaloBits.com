@@ -1,0 +1,57 @@
+---
+// pages/NotFound.astro — the 404 page, one per language. src/pages/404.astro is
+// English (Astro → /404.html, Vercel's default); src/pages/es/404.astro is
+// Spanish, and vercel.json routes unknown /es/... URLs to it.
+import Base from '../../layouts/Base.astro';
+import Button from '../ui/Button.astro';
+import { content } from '../../i18n/content';
+import { localizePath, type Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = content[lang].notFound;
+const meta = content[lang].meta.notFound;
+---
+
+<Base lang={lang} title={meta.title} description={meta.description} flow noindex>
+  <section class="notfound">
+    <div class="wrap">
+      <p class="eyebrow code">404</p>
+      <h1 class="display">{c.title}</h1>
+      <p class="lead">{c.lead}</p>
+      <div class="cta">
+        <Button href={localizePath('/', lang)}>{c.home}</Button>
+        <Button href={localizePath('/contact/', lang)} variant="outline">{c.contact}</Button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    padding: clamp(72px, 10vw, 150px) 0 clamp(96px, 12vw, 180px);
+  }
+  .code {
+    color: var(--apricot);
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: clamp(2.8rem, 7vw, 6.8rem);
+    max-width: 12ch;
+  }
+  .lead {
+    margin-top: 24px;
+    max-width: 30rem;
+    font-size: clamp(17px, 1.35vw, 19px);
+    line-height: 1.55;
+    color: var(--soft);
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+</style>
