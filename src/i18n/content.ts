@@ -147,7 +147,7 @@ export interface SiteContent {
     /** Subject line for the mailto fallback */
     subject: string;
   };
-  notFound: { title: string; lead: string; home: string; build: string };
+  notFound: { title: string; lead: string; home: string; contact: string };
 }
 
 export const content: Record<Lang, SiteContent> = {
@@ -426,7 +426,7 @@ export const content: Record<Lang, SiteContent> = {
       title: 'This page wandered off.',
       lead: "The link is broken or the page moved. Let's get you back on track.",
       home: 'Back home',
-      build: 'What we build',
+      contact: 'Contact us',
     },
   },
 
@@ -705,7 +705,7 @@ export const content: Record<Lang, SiteContent> = {
       title: 'Esta página se perdió.',
       lead: 'El enlace está roto o la página se movió. Volvamos al camino.',
       home: 'Volver al inicio',
-      build: 'Qué hacemos',
+      contact: 'Escríbenos',
     },
   },
 };

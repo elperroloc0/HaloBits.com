@@ -37,6 +37,10 @@ const year = new Date().getFullYear();
     </div>
     <div class="legal">
       <span>© {year} {t.footer.rights}</span>
+      <nav class="legal-links" aria-label={t.footer.privacy + ' / ' + t.footer.terms}>
+        <a href={localizePath('/privacy/', lang)}>{t.footer.privacy}</a>
+        <a href={localizePath('/terms/', lang)}>{t.footer.terms}</a>
+      </nav>
     </div>
   </div>
 </footer>
@@ -98,5 +102,16 @@ const year = new Date().getFullYear();
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
+  }
+  .legal-links {
+    display: flex;
+    gap: 24px;
+  }
+  .legal-links a {
+    padding: 12px 0;
+    text-decoration: none;
+  }
+  .legal-links a:hover {
+    color: var(--cream);
   }
 </style>

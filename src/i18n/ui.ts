@@ -36,6 +36,8 @@ export interface Ui {
   footer: {
     location: string;
     rights: string;
+    privacy: string;
+    terms: string;
   };
 }
 
@@ -53,7 +55,7 @@ export const ui: Record<Lang, Ui> = {
       close: 'Close',
     },
     langLabel: 'Language',
-    footer: { location: 'Miami, FL', rights: 'HaloBits LLC' },
+    footer: { location: 'Miami, FL', rights: 'HaloBits LLC', privacy: 'Privacy', terms: 'Terms' },
   },
   es: {
     nav: {
@@ -68,6 +70,6 @@ export const ui: Record<Lang, Ui> = {
       close: 'Cerrar',
     },
     langLabel: 'Idioma',
-    footer: { location: 'Miami, FL', rights: 'HaloBits LLC' },
+    footer: { location: 'Miami, FL', rights: 'HaloBits LLC', privacy: 'Privacidad', terms: 'Términos' },
   },
 };

@@ -14,6 +14,7 @@ const t = useTranslations(lang);
   <a
     href={alt.en}
     hreflang="en"
+    data-track="language_switch"
     lang="en"
     class:list={['lang-link', { active: lang === 'en' }]}
     aria-current={lang === 'en' ? 'true' : undefined}>EN<span class="dot" aria-hidden="true"></span></a
@@ -22,6 +23,7 @@ const t = useTranslations(lang);
   <a
     href={alt.es}
     hreflang="es"
+    data-track="language_switch"
     lang="es"
     class:list={['lang-link', { active: lang === 'es' }]}
     aria-current={lang === 'es' ? 'true' : undefined}>ES<span class="dot" aria-hidden="true"></span></a

@@ -1,0 +1,63 @@
+---
+// pages/Legal.astro — Privacy and Terms share this one template; the text lives
+// in i18n/legal.ts. Plain readable document on the dark theme.
+import Base from '../../layouts/Base.astro';
+import { legal } from '../../i18n/legal';
+import type { Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  kind: 'privacy' | 'terms';
+}
+const { lang, kind } = Astro.props;
+const doc = legal[lang][kind];
+---
+
+<Base lang={lang} title={`${doc.title} — HaloBits`} description={doc.description} flow>
+  <!-- Release-check marker: reported until the owner clears the attorney review. -->
+  <meta slot="head" name="legal-review" content={legal[lang].reviewNote} />
+  <section class="legal">
+    <div class="wrap">
+      <h1 class="display">{doc.title}</h1>
+      <p class="updated">{doc.updated}</p>
+      {
+        doc.sections.map((s) => (
+          <section>
+            <h2>{s.h}</h2>
+            {s.p.map((p) => <p>{p}</p>)}
+          </section>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .legal {
+    padding: clamp(72px, 10vw, 140px) 0 clamp(96px, 12vw, 180px);
+  }
+  .legal :global(.wrap) {
+    max-width: 44rem;
+  }
+  h1 {
+    font-size: clamp(2.6rem, 6vw, 5rem);
+  }
+  .updated {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  h2 {
+    margin-top: 44px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 2vw, 1.6rem);
+    letter-spacing: -0.02em;
+  }
+  p {
+    margin-top: 12px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--soft);
+  }
+</style>

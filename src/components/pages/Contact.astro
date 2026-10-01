@@ -423,7 +423,7 @@ const i18n = {
         _gotcha: (form.elements.namedItem('_gotcha') as HTMLInputElement).value,
       };
       const endpoint = form.dataset.endpoint;
-      track('contact_submit');
+      track('form_submit');
 
       if (!endpoint) {
         // No backend configured: hand the message to the visitor's email app.

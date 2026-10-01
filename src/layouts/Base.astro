@@ -7,6 +7,7 @@ import Footer from '../components/Footer.astro';
 import Analytics from '@vercel/analytics/astro';
 import { getAlternateUrls, type Lang } from '../i18n/utils';
 import { SITE } from '../lib/site';
+import { IS_PREVIEW } from '../lib/env';
 import '../styles/global.css';
 
 interface Props {
@@ -20,6 +21,8 @@ interface Props {
   theme?: 'dark' | 'light';
   /** Keep the page out of search results (404). */
   noindex?: boolean;
+  /** Extra JSON-LD objects for this page (e.g. FAQPage). */
+  schema?: object[];
 }
 const {
   lang,
@@ -30,7 +33,13 @@ const {
   flow = false,
   theme = 'dark',
   noindex = false,
+  schema = [],
 } = Astro.props;
+
+// Preview deployments are never indexed; production only when the page asks.
+const hideFromSearch = noindex || IS_PREVIEW;
+// Search Console: paste the token from "HTML tag" verification into PUBLIC_GSC_VERIFICATION.
+const gscToken = import.meta.env.PUBLIC_GSC_VERIFICATION;
 
 const alt = getAlternateUrls(Astro.url);
 const canonicalURL = new URL(alt[lang], Astro.site);
@@ -51,6 +60,7 @@ const jsonLd = {
   '@type': 'ProfessionalService',
   name: SITE.name,
   url: SITE.url,
+  logo: new URL('/favicon.svg', Astro.site).toString(),
   image: new URL('/og.jpg', Astro.site).toString(),
   description: description,
   telephone: SITE.phone,
@@ -63,6 +73,7 @@ const jsonLd = {
   },
   areaServed: { '@type': 'City', name: SITE.city },
   availableLanguage: ['English', 'Spanish'],
+  // sameAs: add Google Business Profile / LinkedIn / Instagram URLs here once they exist.
 };
 ---
 
@@ -94,8 +105,14 @@ const jsonLd = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogAlt} />
-    {noindex && <meta name="robots" content="noindex" />}
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    {hideFromSearch && <meta name="robots" content="noindex, nofollow" />}
+    {gscToken && <meta name="google-site-verification" content={gscToken} />}
+    {
+      [jsonLd, ...schema].map((obj) => (
+        <script type="application/ld+json" is:inline set:html={JSON.stringify(obj)} />
+      ))
+    }
+    <slot name="head" />
     <meta name="theme-color" content={theme === 'light' ? '#EFE6D6' : '#14110F'} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -167,17 +184,39 @@ const jsonLd = {
 </script>
 
 <script>
-  // Conversion tracking. Buttons carry data-track="event_name" (see Button.astro);
-  // phone and email links are caught automatically. One delegated listener, so
-  // it works for every link on the page. Custom events need a Vercel plan that
-  // includes them — on other plans the call is simply ignored.
+  // Conversion tracking. One delegated listener for every link on the page.
+  // Event names (all carry a `location` property: nav, hero, footer, ...):
+  //   cta_click               buttons marked data-track="cta_*"
+  //   phone_click / whatsapp_click / calendar_click / email_click   by href
+  //   outbound_concierge_click   links to concierge.halobits.com
+  //   language_switch          the EN / ES toggle
+  // Custom events need a Vercel plan that includes them; otherwise ignored.
   import { track } from '@vercel/analytics';
+
+  const eventFor = (a: HTMLAnchorElement): string => {
+    const href = a.getAttribute('href') ?? '';
+    const tag = a.dataset.track ?? '';
+    if (href.startsWith('tel:')) return 'phone_click';
+    if (href.startsWith('mailto:')) return 'email_click';
+    if (/^https?:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) return 'whatsapp_click';
+    if (/^https?:\/\/([^/]*\.)?(cal\.com|calendly\.com)\//.test(href) || tag === 'calendar_click') return 'calendar_click';
+    if (/^https?:\/\/concierge\.halobits\.com/.test(href)) return 'outbound_concierge_click';
+    if (tag === 'language_switch') return tag;
+    if (tag.startsWith('cta')) return 'cta_click';
+    return '';
+  };
+  const locationOf = (a: HTMLAnchorElement): string => {
+    if (a.closest('header')) return 'nav';
+    if (a.closest('footer')) return 'footer';
+    // Buttons carry their own spot in the name: cta_talk_hero → "hero".
+    const tag = a.dataset.track ?? '';
+    return tag.startsWith('cta_') ? tag.split('_').slice(2).join('_') || 'page' : 'page';
+  };
 
   document.addEventListener('click', (e) => {
     const a = (e.target as Element).closest<HTMLAnchorElement>('a');
     if (!a) return;
-    const href = a.getAttribute('href') ?? '';
-    const name = a.dataset.track ?? (href.startsWith('tel:') ? 'click_phone' : href.startsWith('mailto:') ? 'click_email' : '');
-    if (name) track(name);
+    const name = eventFor(a);
+    if (name) track(name, { location: locationOf(a), target: a.dataset.track ?? '' });
   });
 </script>

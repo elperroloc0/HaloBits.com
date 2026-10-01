@@ -1,8 +1,8 @@
 ---
 // pages/Faq.astro — cream page: intro on the left, accordion on the right.
-// Each question is a <button aria-expanded aria-controls> inside an <h2>; the
-// "+" icon turns into "×" (45° rotate) when open. The first item starts open.
-// Progressive enhancement: without JS every answer is shown (see <noscript>).
+// Native <details>/<summary>: every answer is real HTML in the page (indexable,
+// readable without JS), and the browser handles open/close + keyboard. The "+"
+// icon turns into "×" (45° rotate) when open. The first item starts open.
 import Base from '../../layouts/Base.astro';
 import Band from '../ui/Band.astro';
 import Button from '../ui/Button.astro';
@@ -15,9 +15,20 @@ interface Props {
 const { lang } = Astro.props;
 const t = content[lang].faq;
 const meta = content[lang].meta.faq;
+
+// FAQPage structured data, built from the same strings the page shows.
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: t.items.map((q) => ({
+    '@type': 'Question',
+    name: q.q,
+    acceptedAnswer: { '@type': 'Answer', text: q.a },
+  })),
+};
 ---
 
-<Base lang={lang} title={meta.title} description={meta.description} current="faq" tone="light" flow theme="light">
+<Base lang={lang} title={meta.title} description={meta.description} current="faq" tone="light" flow theme="light" schema={[faqSchema]}>
   <section class="faq">
     <div class="wrap faq-in">
       <div class="intro">
@@ -29,31 +40,29 @@ const meta = content[lang].meta.faq;
       <div class="list">
         {
           t.items.map((q, i) => (
-            <div class="item">
-              <h2>
-                <button type="button" class="q" aria-expanded={i === 0 ? 'true' : 'false'} aria-controls={`faq-${i}`}>
-                  <span>{q.q}</span>
-                  <svg
-                    class="icon"
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="12" r="9.5" />
-                    <path d="M12 8v8M8 12h8" />
-                  </svg>
-                </button>
-              </h2>
-              <div class="a" id={`faq-${i}`} hidden={i !== 0}>
+            <details class="item" open={i === 0}>
+              <summary class="q">
+                <h2>{q.q}</h2>
+                <svg
+                  class="icon"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="9.5" />
+                  <path d="M12 8v8M8 12h8" />
+                </svg>
+              </summary>
+              <div class="a">
                 <p>{q.a}</p>
                 {q.link && q.href && <a href={localizePath(q.href, lang)}>{q.link}</a>}
               </div>
-            </div>
+            </details>
           ))
         }
       </div>
@@ -62,14 +71,6 @@ const meta = content[lang].meta.faq;
 
   <Band from="#EFE6D6" to="#14110F" />
 
-  <!-- No JS → show every answer instead of hiding them behind dead buttons. -->
-  <noscript>
-    <style is:inline>
-      .a[hidden] {
-        display: block !important;
-      }
-    </style>
-  </noscript>
 </Base>
 
 <style>
@@ -110,6 +111,7 @@ const meta = content[lang].meta.faq;
     border-bottom: 1px solid rgba(20, 17, 15, 0.14);
   }
   .q {
+    list-style: none;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -121,6 +123,11 @@ const meta = content[lang].meta.faq;
     cursor: var(--cursor-hand);
     text-align: left;
     color: var(--ink);
+  }
+  .q::-webkit-details-marker {
+    display: none;
+  }
+  .q h2 {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: clamp(1.2rem, 1.7vw, 1.5rem);
@@ -134,15 +141,12 @@ const meta = content[lang].meta.faq;
     flex: 0 0 28px;
     transition: transform 0.3s var(--ease);
   }
-  .q[aria-expanded='true'] .icon {
+  .item[open] .icon {
     transform: rotate(45deg);
   }
   .a {
     padding: 0 48px 28px 0;
     max-width: 40rem;
-  }
-  .a[hidden] {
-    display: none;
   }
   .a p {
     font-size: 17px;
@@ -158,16 +162,3 @@ const meta = content[lang].meta.faq;
     text-underline-offset: 5px;
   }
 </style>
-
-<script>
-  // One handler for the whole list. Questions toggle independently (several can
-  // be open at once), matching the design.
-  document.querySelectorAll<HTMLButtonElement>('.faq .q').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const open = btn.getAttribute('aria-expanded') === 'true';
-      btn.setAttribute('aria-expanded', String(!open));
-      const panel = document.getElementById(btn.getAttribute('aria-controls') ?? '');
-      if (panel) panel.hidden = open;
-    });
-  });
-</script>
