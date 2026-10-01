@@ -1,10 +1,10 @@
 ---
 // pages/Contact.astro — one section: the headline and the form on the big orange sun.
 //
-// The form has NO backend yet (handoff open item #1). Behaviour:
-//   • PUBLIC_CONTACT_ENDPOINT set  → POST the fields as JSON (works with
-//     Formspree-style services). Success / error states are shown in place.
-//   • not set (today)              → fall back to opening the visitor's email app
+// Submissions go to Formspree (see `endpoint` below). Behaviour:
+//   • endpoint set                 → POST the fields as JSON. Success / error states
+//     are shown in place.
+//   • not set                      → falls back to opening the visitor's email app
 //     with a pre-filled mailto: message to hello@halobits.com.
 // Validation (name required, email format, message ≥ 8 chars) runs either way.
 import { Image } from 'astro:assets';
@@ -22,7 +22,9 @@ const t = content[lang].contact;
 const meta = content[lang].meta.contact;
 const book = primaryCta(lang, 'contact');
 const sms = smsCta(lang, 'contact');
-const endpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '';
+// Formspree form that forwards submissions to hello@halobits.com. Override with
+// PUBLIC_CONTACT_ENDPOINT; set it to an empty string to fall back to mailto:.
+const endpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? 'https://formspree.io/f/mrpbvjav';
 
 // Strings the client script needs (it can't import content.ts), as inert JSON.
 const i18n = {
