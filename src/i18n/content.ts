@@ -352,7 +352,7 @@ export const content: Record<Lang, SiteContent> = {
       details: [
         {
           t: 'What we do',
-          b: 'We build software that takes repetitive, boring work off your plate. Each tool is fitted to one business: we ship a working first version and refine it with you in the real world.',
+          b: 'We build software that takes repetitive, time-consuming work off your plate. Each tool is fitted to one business: we ship a working first version and refine it with you in the real world.',
         },
         {
           t: 'Who we are',
@@ -650,7 +650,7 @@ export const content: Record<Lang, SiteContent> = {
       details: [
         {
           t: 'Qué hacemos',
-          b: 'Hacemos software que te quita de encima el trabajo repetitivo y aburrido. Cada herramienta se ajusta a un negocio: lanzamos una primera versión que funciona y la afinamos contigo en el día a día.',
+          b: 'Hacemos software que te quita de encima el trabajo repetitivo que consume tiempo. Cada herramienta se ajusta a un negocio: lanzamos una primera versión que funciona y la afinamos contigo en el día a día.',
         },
         {
           t: 'Quiénes somos',
@@ -947,7 +947,7 @@ export const content: Record<Lang, SiteContent> = {
       details: [
         {
           t: 'Чем мы занимаемся',
-          b: 'Мы делаем программы, которые снимают с вас однотипную, скучную работу. Каждый инструмент подгоняется под один бизнес: мы выпускаем рабочую первую версию и дорабатываем её вместе с вами в реальной работе.',
+          b: 'Мы делаем программы, которые снимают с вас однотипную, отнимающую время работу. Каждый инструмент подгоняется под один бизнес: мы выпускаем рабочую первую версию и дорабатываем её вместе с вами в реальной работе.',
         },
         {
           t: 'Кто мы',

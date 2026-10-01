@@ -11,6 +11,7 @@
 // Screenshots that don't exist yet are dev-only placeholders (lib/placeholders.ts).
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
+import PixelDivider from '../ui/PixelDivider.astro';
 import Button from '../ui/Button.astro';
 import { content } from '../../i18n/content';
 import { SHOW_PLACEHOLDERS } from '../../lib/placeholders';
@@ -69,14 +70,17 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
                     <span class="for">{p.for}</span>
                   </p>
                   <h2 class="display name">{p.name}</h2>
+                  <PixelDivider />
                   <div class="block">
                     <p class="eyebrow label">{t.problemLabel}</p>
                     <p class="who">{p.problem}</p>
                   </div>
+                  <PixelDivider />
                   <div class="block">
                     <p class="eyebrow label">{t.builtLabel}</p>
                     <p class="who">{p.desc}</p>
                   </div>
+                  {p.result && <PixelDivider />}
                   {p.result && (
                     <div class="block">
                       <p class="eyebrow label">{t.resultLabel}</p>
@@ -84,6 +88,7 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
                     </div>
                   )}
 
+                  {p.includes && <PixelDivider />}
                   {p.includes && (
                     <div class="block">
                       <p class="eyebrow label">{t.includes}</p>
@@ -98,6 +103,7 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
                     </div>
                   )}
 
+                  <PixelDivider />
                   <div class="block">
                     <p class="eyebrow label">{t.who}</p>
                     <p class="who">{p.who}</p>
@@ -289,8 +295,8 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
     display: none;
   }
   .copy {
-    flex: 5 1 340px;
-    max-width: 36rem;
+    flex: 4 1 320px;
+    max-width: 27rem;
   }
   .meta {
     display: flex;
@@ -303,8 +309,8 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
     color: var(--apricot);
   }
   .name {
-    margin-top: 12px;
-    font-size: clamp(2.6rem, 5vw, 4.6rem);
+    margin-top: 10px;
+    font-size: clamp(2.2rem, 3.8vw, 3.4rem);
   }
   .desc {
     margin-top: 22px;
@@ -348,15 +354,15 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
     color: var(--soft);
   }
   .block {
-    margin-top: 28px;
+    margin-top: 14px;
   }
   .label {
     color: var(--muted);
   }
   .who {
-    margin-top: 10px;
-    font-size: 16px;
-    line-height: 1.55;
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.5;
     color: var(--soft);
   }
   .includes {
@@ -365,9 +371,9 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    font-size: 16px;
-    line-height: 1.5;
+    gap: 5px;
+    font-size: 15px;
+    line-height: 1.45;
   }
   .includes li {
     display: flex;
@@ -382,12 +388,12 @@ const href = (h: string) => (h.startsWith('/') ? localizePath(h, lang) : h);
     transform: translateY(-2px);
   }
   :global(.btn.cta) {
-    margin-top: 32px;
+    margin-top: 26px;
   }
 
   /* right-hand column: screenshot (or dev placeholder) with the stats under it */
   .side {
-    flex: 6 1 420px;
+    flex: 8 1 460px;
     min-width: 0;
   }
   .side--phone {
