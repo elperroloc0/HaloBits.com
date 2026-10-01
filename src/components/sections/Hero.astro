@@ -7,8 +7,8 @@ import hero from '../../assets/hero-computer.jpg';
 import Button from '../ui/Button.astro';
 import Fade from '../ui/Fade.astro';
 import { content } from '../../i18n/content';
-import { primaryCta, smsCta } from '../../lib/cta';
-import type { Lang } from '../../i18n/utils';
+import { primaryCta } from '../../lib/cta';
+import { localizePath, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;
@@ -16,7 +16,7 @@ interface Props {
 const { lang } = Astro.props;
 const c = content[lang].home.hero;
 const main = primaryCta(lang, 'hero');
-const sms = smsCta(lang, 'hero');
+const projectsHref = localizePath('/what-we-build/', lang);
 ---
 
 <section class="hero">
@@ -39,7 +39,7 @@ const sms = smsCta(lang, 'hero');
     <p class="sub">{c.sub}</p>
     <div class="ctas">
       <Button href={main.href} size="sm" external={main.external} track={main.track}>{main.label}</Button>
-      <Button href={sms.href} size="sm" variant="outline" class="ghost" track={sms.track}>{sms.label}</Button>
+      <Button href={projectsHref} size="sm" variant="outline" class="ghost" track="cta_projects_hero">{c.projects}</Button>
     </div>
   </div>
 

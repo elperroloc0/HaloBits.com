@@ -13,7 +13,6 @@ import sun from '../../assets/contact-sun.png';
 import { content } from '../../i18n/content';
 import type { Lang } from '../../i18n/utils';
 import { primaryCta, smsCta } from '../../lib/cta';
-import { SITE, telHref } from '../../lib/site';
 
 interface Props {
   lang: Lang;
@@ -57,7 +56,6 @@ const i18n = {
           <div class="quick-row">
             <a class="qbtn" href={sms.href} data-track={sms.track}>{sms.label}</a>
             {book.external && <a class="qbtn" href={book.href} target="_blank" rel="noopener noreferrer" data-track={book.track}>{book.label}</a>}
-            <a class="qlink" href={telHref}>{SITE.phoneDisplay}</a>
           </div>
         </div>
 
@@ -196,11 +194,6 @@ const i18n = {
     color: var(--cream);
     text-decoration: none;
     font-weight: 500;
-  }
-  .qlink {
-    padding: 12px 4px;
-    font-weight: 500;
-    text-underline-offset: 5px;
   }
   form {
     margin-top: 40px;

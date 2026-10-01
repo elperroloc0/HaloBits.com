@@ -4,19 +4,19 @@
 // bottom (the footer below), so there are no hard edges.
 import { Image } from 'astro:assets';
 import sea from '../../assets/sea-sky.jpg';
-import Button from '../ui/Button.astro';
 import Fade from '../ui/Fade.astro';
 import { content } from '../../i18n/content';
 import type { Lang } from '../../i18n/utils';
-import { primaryCta, smsCta } from '../../lib/cta';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const c = content[lang].home.cta;
-const main = primaryCta(lang, 'closing');
-const sms = smsCta(lang, 'closing');
+// Last word goes on its own line: "Let's build something" / "together."
+const cut = c.title.lastIndexOf(' ');
+const line1 = c.title.slice(0, cut);
+const line2 = c.title.slice(cut + 1);
 ---
 
 <section class="cta">
@@ -24,12 +24,7 @@ const sms = smsCta(lang, 'closing');
   <div class="top" aria-hidden="true"></div>
   <Fade color="#14110F" height="30%" />
   <div class="wrap in">
-    <h2 class="display">{c.title}</h2>
-    <p class="body">{c.body}</p>
-    <div class="actions">
-      <Button href={main.href} size="lg" external={main.external} track={main.track}>{main.label}</Button>
-      <Button href={sms.href} size="lg" variant="outline" track={sms.track}>{sms.label}</Button>
-    </div>
+    <h2 class="display" data-fit><span>{line1}</span><span>{line2}</span></h2>
   </div>
 </section>
 
@@ -70,22 +65,30 @@ const sms = smsCta(lang, 'closing');
   h2 {
     font-size: clamp(2.8rem, 6.6vw, 6.4rem);
     line-height: 0.94;
-    max-width: 13ch;
+    white-space: nowrap;
     color: var(--cream);
   }
-  .body {
-    margin-top: 24px;
-    max-width: 28rem;
-    font-size: clamp(17px, 1.35vw, 19px);
-    line-height: 1.5;
-    color: #f4ede0;
-    text-shadow: 0 1px 18px rgba(20, 17, 15, 0.4);
-  }
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 26px;
-    margin-top: 32px;
+  h2 span {
+    display: block;
+    width: max-content;
   }
 </style>
+
+<script>
+  // Stretch the headline's longest line to the full width of its container:
+  // measure at a known size, then scale the font so it ends at the right edge.
+  function fit() {
+    document.querySelectorAll<HTMLElement>('[data-fit]').forEach((el) => {
+      const box = el.parentElement;
+      if (!box) return;
+      const cs = getComputedStyle(box);
+      const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      el.style.fontSize = '100px';
+      const w = Math.max(...Array.from(el.children, (c) => (c as HTMLElement).offsetWidth));
+      if (w > 0 && avail > 0) el.style.fontSize = `${(100 * avail) / w}px`;
+    });
+  }
+  fit();
+  document.fonts?.ready.then(fit);
+  window.addEventListener('resize', fit);
+</script>

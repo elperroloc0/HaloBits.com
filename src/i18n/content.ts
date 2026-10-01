@@ -78,7 +78,7 @@ export interface SiteContent {
     notFound: Meta;
   };
   home: {
-    hero: { l1: string; l2: string; tag: string; sub: string; alt: string };
+    hero: { l1: string; l2: string; tag: string; sub: string; projects: string; alt: string };
     problems: { title: string; items: Array<{ t: string; b: string }> };
     pricing: {
       title: string;
@@ -104,7 +104,7 @@ export interface SiteContent {
       /** "M" — used for the desktop tick labels ("M1") */
       m: string;
     };
-    cta: { title: string; body: string; btn: string; alt2: string; alt: string };
+    cta: { title: string; alt: string };
   };
   buildPage: {
     title: string;
@@ -201,14 +201,15 @@ export const content: Record<Lang, SiteContent> = {
         l2: 'off your plate.',
         tag: 'Not a service. A partner.',
         sub: 'Custom software, automation and websites for small businesses. Built in Miami, in English and Spanish. A first version in 2 weeks to a month, then we run it with you. Month to month, cancel anytime.',
+        projects: 'Our projects',
         alt: 'Painting of an old computer on a grassy hill above the sea, with the Miami skyline and a large orange sun.',
       },
       problems: {
         title: 'The work that keeps coming back.',
         items: [
-          { t: 'The phone rings and nobody can pick up.', b: 'Every missed call is a customer who may go somewhere else.' },
-          { t: '“Where is the van?”', b: 'The same question to the front desk, every afternoon.' },
-          { t: 'Receipts pile up.', b: 'Paper to chase and sort before the accountant can use any of it.' },
+          { t: 'Nobody is free to answer.', b: 'Calls and messages wait while you are busy, and each one is a customer who may go somewhere else.' },
+          { t: 'The same question, every day.', b: 'Customers keep asking what your team already knows, and every answer pulls someone off real work.' },
+          { t: 'Paperwork piles up.', b: 'Invoices, forms and spreadsheets to copy, sort and chase before anyone can use them.' },
         ],
       },
       build: {
@@ -264,9 +265,6 @@ export const content: Record<Lang, SiteContent> = {
       },
       cta: {
         title: "Let's build something together.",
-        body: 'Bring us the task that keeps coming back. The first conversation is free, in English or Spanish.',
-        btn: 'Start a conversation',
-        alt2: 'Browse what we already offer',
         alt: 'Painted sunset over the sea with a large orange sun, pixelated clouds and a distant skyline.',
       },
     },
@@ -395,7 +393,7 @@ export const content: Record<Lang, SiteContent> = {
         },
         {
           q: 'Do you only build for restaurants?',
-          a: 'No. We come out of hospitality, so that is where we started, but we build for any small or mid-sized business.',
+          a: 'No. We come out of hospitality, so that is where we started, but we build for any small business, in any line of work.',
         },
         {
           q: "We're small. Are we too small for you?",
@@ -403,9 +401,9 @@ export const content: Record<Lang, SiteContent> = {
         },
         {
           q: 'What does it cost?',
-          a: "You start small: a setup fee and a monthly fee, month to month, cancel anytime. No long contract. Each tool's page has its own numbers, so the price is tied to what you actually get. If you'd rather buy a program outright, we can do that too.",
-          link: 'See our tools',
-          href: '/what-we-build/',
+          a: "You start small: a setup fee and a monthly fee, month to month, cancel anytime. No long contract. A landing page starts at $100, a bigger website at $500, and software or automation at $200. Running it with you is about $100 a month. If you'd rather buy a program outright, we can do that too.",
+          link: 'See prices',
+          href: '/#pricing',
         },
         {
           q: 'What do you need from me to start?',
@@ -501,14 +499,15 @@ export const content: Record<Lang, SiteContent> = {
         l2: 'el trabajo repetitivo.',
         tag: 'No es un servicio. Es un socio.',
         sub: 'Software a la medida, automatización y sitios web para negocios pequeños. Hecho en Miami, en inglés y en español. Una primera versión en 2 semanas a un mes, y después lo manejamos contigo. Mes a mes, cancelas cuando quieras.',
+        projects: 'Nuestros proyectos',
         alt: 'Pintura de una computadora antigua sobre una loma frente al mar, con el skyline de Miami y un gran sol naranja.',
       },
       problems: {
         title: 'El trabajo que siempre vuelve.',
         items: [
-          { t: 'Suena el teléfono y nadie puede contestar.', b: 'Cada llamada perdida es un cliente que puede irse a otro lado.' },
-          { t: '“¿Dónde está la van?”', b: 'La misma pregunta a la recepción, todas las tardes.' },
-          { t: 'Los recibos se acumulan.', b: 'Papeles que perseguir y ordenar antes de que tu contador pueda usarlos.' },
+          { t: 'Nadie tiene tiempo de contestar.', b: 'Las llamadas y los mensajes esperan mientras estás ocupado, y cada uno es un cliente que puede irse a otro lado.' },
+          { t: 'La misma pregunta, todos los días.', b: 'Los clientes siguen preguntando lo que tu equipo ya sabe, y cada respuesta saca a alguien del trabajo de verdad.' },
+          { t: 'El papeleo se acumula.', b: 'Facturas, formularios y hojas de cálculo que copiar, ordenar y perseguir antes de que alguien pueda usarlos.' },
         ],
       },
       build: {
@@ -564,9 +563,6 @@ export const content: Record<Lang, SiteContent> = {
       },
       cta: {
         title: 'Construyamos algo juntos.',
-        body: 'Tráenos la tarea que siempre vuelve. La primera conversación es gratis, en inglés o en español.',
-        btn: 'Empezar a hablar',
-        alt2: 'Mira lo que ya ofrecemos',
         alt: 'Atardecer pintado sobre el mar con un gran sol naranja, nubes pixeladas y un skyline a lo lejos.',
       },
     },
@@ -695,7 +691,7 @@ export const content: Record<Lang, SiteContent> = {
         },
         {
           q: '¿Solo trabajan con restaurantes?',
-          a: 'No. Venimos de la hostelería, por eso empezamos ahí, pero hacemos software para cualquier negocio pequeño o mediano.',
+          a: 'No. Venimos de la hostelería, por eso empezamos ahí, pero trabajamos con cualquier negocio pequeño, de cualquier rubro.',
         },
         {
           q: 'Somos pequeños. ¿Somos demasiado pequeños para ustedes?',
@@ -703,9 +699,9 @@ export const content: Record<Lang, SiteContent> = {
         },
         {
           q: '¿Cuánto cuesta?',
-          a: 'Empiezas en pequeño: una cuota de instalación y una mensualidad, mes a mes, cancelas cuando quieras. Sin contrato largo. Cada herramienta tiene sus números en su propia página, así el precio va atado a lo que recibes. Si prefieres comprar un programa y quedártelo, también se puede.',
-          link: 'Ver nuestras herramientas',
-          href: '/what-we-build/',
+          a: 'Empiezas en pequeño: una cuota de instalación y una mensualidad, mes a mes, cancelas cuando quieras. Sin contrato largo. Una página de aterrizaje empieza en $100, un sitio web más completo en $500, y el software o la automatización en $200. Operarlo contigo cuesta unos $100 al mes. Si prefieres comprar un programa y quedártelo, también se puede.',
+          link: 'Ver precios',
+          href: '/#pricing',
         },
         {
           q: '¿Qué necesitan de mí para empezar?',
