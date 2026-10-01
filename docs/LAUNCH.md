@@ -10,7 +10,7 @@
 5. Preview deployments are automatically `noindex` + `Disallow: /` (see `src/lib/env.ts`). Production is indexable. After the first production deploy, confirm:
    - `https://halobits.com/robots.txt` shows `Allow: /` and the sitemap line
    - view-source of the home page has **no** `<meta name="robots">`
-6. Before launch run `npm run build && npm run check:release`. It fails while any `TODO_OWNER` placeholder (currently: the attorney review of Privacy/Terms) is still in the output.
+6. Before launch run `npm run build && npm run check:release`. It fails while any `TODO_OWNER` placeholder (currently: the attorney review of Privacy/Terms) is still in the output. A normal Vercel build only *warns* about placeholders, so open owner tasks never block a deploy; local paths or dev hosts in the output DO fail a production build.
 
 ## 2. Google Search Console
 1. search.google.com/search-console → **Add property → URL prefix → https://halobits.com**.
