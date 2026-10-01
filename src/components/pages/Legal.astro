@@ -14,8 +14,6 @@ const doc = legal[lang][kind];
 ---
 
 <Base lang={lang} title={`${doc.title} — HaloBits`} description={doc.description} flow>
-  <!-- Release-check marker: reported until the owner clears the attorney review. -->
-  <meta slot="head" name="legal-review" content={legal[lang].reviewNote} />
   <section class="legal">
     <div class="wrap">
       <h1 class="display">{doc.title}</h1>

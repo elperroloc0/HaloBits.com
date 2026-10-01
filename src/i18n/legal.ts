@@ -2,8 +2,8 @@
 // legal.ts — Privacy and Terms copy, all languages. Conservative template text.
 // It describes ONLY what the site actually does (a contact form, cookieless
 // page-view analytics). It says nothing about call recording or consent — add
-// that only if the owner provides it. Must be reviewed by an attorney before
-// launch (the Legal page emits a TODO_OWNER marker the release check reports).
+// that only if the owner provides it. The owner accepted this text as is (no
+// attorney review, Oct 2026); revisit it if the site starts collecting more data.
 // =============================================================================
 import type { Lang } from './ui';
 
@@ -20,14 +20,12 @@ interface Doc {
 export interface LegalContent {
   privacy: Doc;
   terms: Doc;
-  reviewNote: string;
 }
 
 const EMAIL = 'hello@halobits.com';
 
 export const legal: Record<Lang, LegalContent> = {
   en: {
-    reviewNote: 'TODO_OWNER: review by attorney',
     privacy: {
       title: 'Privacy',
       description: 'What halobits.com collects when you write to us, why, how long we keep it, and how to ask us to delete it.',
@@ -97,7 +95,6 @@ export const legal: Record<Lang, LegalContent> = {
   },
 
   es: {
-    reviewNote: 'TODO_OWNER: review by attorney',
     privacy: {
       title: 'Privacidad',
       description: 'Qué datos recoge halobits.com cuando nos escribes, para qué, cuánto tiempo los guardamos y cómo pedir que los borremos.',
@@ -166,7 +163,6 @@ export const legal: Record<Lang, LegalContent> = {
     },
   },
   ru: {
-    reviewNote: 'TODO_OWNER: review by attorney',
     privacy: {
       title: 'Конфиденциальность',
       description: 'Какие данные собирает halobits.com, когда вы нам пишете, зачем, как долго мы их храним и как попросить их удалить.',
