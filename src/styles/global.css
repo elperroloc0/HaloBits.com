@@ -5,7 +5,7 @@
    wrapper, buttons, the text link, type helpers and scroll-reveal. Anything used
    by a single component is in that component's <style> block (Astro scopes it).
 
-   The previous (blue, dark-glass) theme is preserved in git: tag `v1-old-design`.
+   The previous (blue, dark-glass) theme is preserved in git: tag `old-site-v1`.
    ============================================================================ */
 
 :root {
