@@ -360,7 +360,7 @@ tags exist by viewing source on `npm run preview`.
    Astro (build command `npm run build`, output `dist/`).
 3. In **Settings → Domains**, add `halobits.com`.
 4. Point DNS at Vercel (see the records in
-   [.sidefiles/halobits-site-starter.md](.sidefiles/halobits-site-starter.md)):
+   [docs/LAUNCH.md](docs/LAUNCH.md)):
    an `A` record for the apex, a `CNAME` for `www`, and a separate `CNAME` for
    `concierge` that points at the product's own host.
 
