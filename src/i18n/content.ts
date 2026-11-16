@@ -171,26 +171,26 @@ export const content: Record<Lang, SiteContent> = {
       home: {
         title: 'HaloBits — Custom software and websites for small businesses in Miami',
         description:
-          'Websites, automation and custom software for small businesses. Built in Miami, in English and Spanish. First version in 2 weeks to a month, then month to month. From $100.',
+          'Custom software, automation and websites for small businesses in Miami. First version in 2 weeks to a month, then month to month. From $100.',
       },
       whatWeBuild: {
-        title: 'What we build — HaloBits',
+        title: 'What we build: AI Concierge and custom tools — HaloBits',
         description:
-          'AI Concierge, Van Tracker, Receipt Scanner and custom software — tools built for one business, ready for yours.',
+          'AI Concierge, Van Tracker, Receipt Scanner and custom software for small businesses. Tools built for one business, ready to be built for yours.',
       },
       about: {
-        title: 'About — HaloBits',
+        title: 'About HaloBits — a small Miami software studio',
         description:
-          'HaloBits is a small Miami software studio. We build custom tools and websites for small businesses, and stay to run them with you.',
+          'HaloBits is a small Miami software studio. We build custom tools and websites for small businesses, and stay to run them with you, month to month.',
       },
       contact: {
-        title: 'Contact — HaloBits',
-        description: 'Tell us what eats your day. Text us, book a free call or send a message. We answer in English or Spanish.',
+        title: 'Contact HaloBits — text, call or book a free call',
+        description: 'Tell us what eats your day. Text us, book a free 15-minute call or send a message. Based in Miami; we answer in English or Spanish.',
       },
       faq: {
-        title: 'FAQ — HaloBits',
+        title: 'FAQ: custom software, pricing and how it works — HaloBits',
         description:
-          'Straight answers about how HaloBits builds custom software, what it costs, and what to expect.',
+          'Straight answers about how HaloBits builds custom software and websites for small businesses, what it costs, and what to expect from start to finish.',
       },
       notFound: { title: 'Page not found — HaloBits', description: '' },
     },
@@ -469,26 +469,26 @@ export const content: Record<Lang, SiteContent> = {
       home: {
         title: 'HaloBits — Software y sitios web a la medida para negocios pequeños en Miami',
         description:
-          'Sitios web, automatización y software a la medida para negocios pequeños. Hecho en Miami, en inglés y en español. Primera versión en 2 semanas a un mes, después mes a mes. Desde $100.',
+          'Software, automatización y sitios web a la medida para negocios pequeños en Miami. Primera versión en 2 semanas a un mes, después mes a mes. Desde $100.',
       },
       whatWeBuild: {
-        title: 'Qué hacemos — HaloBits',
+        title: 'Qué hacemos: AI Concierge y software a medida — HaloBits',
         description:
-          'AI Concierge, Van Tracker, Receipt Scanner y software a la medida: herramientas hechas para un negocio, listas para el tuyo.',
+          'AI Concierge, Van Tracker, Receipt Scanner y software a la medida para negocios pequeños. Herramientas hechas para un negocio, listas para el tuyo.',
       },
       about: {
-        title: 'Nosotros — HaloBits',
+        title: 'Sobre HaloBits — estudio de software en Miami',
         description:
-          'HaloBits es un pequeño estudio de software en Miami. Hacemos herramientas y sitios web a la medida para negocios pequeños, y nos quedamos para operarlos contigo.',
+          'HaloBits es un pequeño estudio de software en Miami. Hacemos herramientas y sitios web a la medida para negocios pequeños y los operamos contigo mes a mes.',
       },
       contact: {
-        title: 'Contacto — HaloBits',
-        description: 'Cuéntanos qué te quita tiempo. Escríbenos por SMS, agenda una llamada gratis o manda un mensaje. Respondemos en inglés o en español.',
+        title: 'Contacto HaloBits — escríbenos o agenda una llamada gratis',
+        description: 'Cuéntanos qué te quita tiempo. Escríbenos, agenda una llamada gratis de 15 minutos o manda un mensaje. Desde Miami, en inglés o en español.',
       },
       faq: {
-        title: 'Preguntas frecuentes — HaloBits',
+        title: 'Preguntas frecuentes: software a medida y precios — HaloBits',
         description:
-          'Respuestas directas sobre cómo HaloBits crea software a medida, cuánto cuesta y qué esperar.',
+          'Respuestas directas sobre cómo HaloBits crea software y sitios web a medida para negocios pequeños, cuánto cuesta y qué esperar de principio a fin.',
       },
       notFound: { title: 'Página no encontrada — HaloBits', description: '' },
     },
@@ -766,26 +766,26 @@ export const content: Record<Lang, SiteContent> = {
       home: {
         title: 'HaloBits — программы и сайты на заказ для малого бизнеса в Майами',
         description:
-          'Сайты, автоматизация и программы на заказ для малого бизнеса. Делаем в Майами, на английском, испанском и русском. Первая версия за 2 недели — месяц, дальше помесячно. От $100.',
+          'Программы, автоматизация и сайты на заказ для малого бизнеса в Майами. Первая версия за 2 недели — месяц, дальше помесячно. От $100.',
       },
       whatWeBuild: {
-        title: 'Что мы делаем — HaloBits',
+        title: 'Что мы делаем: AI Concierge и программы на заказ — HaloBits',
         description:
-          'AI Concierge, Van Tracker, Receipt Scanner и программы на заказ — инструменты, созданные для одного бизнеса и готовые для вашего.',
+          'AI Concierge, Van Tracker, Receipt Scanner и программы на заказ для малого бизнеса. Инструменты, созданные для одного бизнеса и готовые для вашего.',
       },
       about: {
-        title: 'О нас — HaloBits',
+        title: 'О HaloBits — небольшая студия разработки в Майами',
         description:
-          'HaloBits — небольшая студия разработки в Майами. Мы делаем инструменты и сайты на заказ для малого бизнеса и остаёмся, чтобы вести их вместе с вами.',
+          'HaloBits — небольшая студия разработки в Майами. Делаем инструменты и сайты на заказ для малого бизнеса и ведём их вместе с вами помесячно.',
       },
       contact: {
-        title: 'Контакты — HaloBits',
-        description: 'Расскажите, что отнимает у вас время. Напишите в SMS, запишитесь на бесплатный звонок или отправьте сообщение. Отвечаем на английском, испанском или русском.',
+        title: 'Контакты HaloBits — напишите или запишитесь на звонок',
+        description: 'Расскажите, что отнимает у вас время. Напишите, запишитесь на бесплатный 15-минутный звонок или отправьте сообщение. Отвечаем на русском, английском, испанском.',
       },
       faq: {
-        title: 'Частые вопросы — HaloBits',
+        title: 'Частые вопросы: программы на заказ и цены — HaloBits',
         description:
-          'Прямые ответы о том, как HaloBits создаёт программы на заказ, сколько это стоит и чего ожидать.',
+          'Прямые ответы о том, как HaloBits создаёт программы и сайты на заказ для малого бизнеса, сколько это стоит и чего ожидать от начала до конца.',
       },
       notFound: { title: 'Страница не найдена — HaloBits', description: '' },
     },

@@ -4,6 +4,8 @@
 // =============================================================================
 export const SITE = {
   name: 'HaloBits',
+  /** Registered company name (matches the footer, Privacy and Terms). */
+  legalName: 'HaloBits LLC',
   url: 'https://halobits.com',
   email: 'hello@halobits.com',
   /** E.164 format for tel: links */
@@ -13,6 +15,14 @@ export const SITE = {
   city: 'Miami',
   region: 'FL',
   country: 'US',
+} as const;
+
+/** Short description of the business for structured data (JSON-LD). The English text
+ *  matches the Google Business Profile description; keep the two in sync. No price. */
+export const ORG_DESCRIPTION = {
+  en: 'HaloBits is a Miami studio that builds websites, automation and custom software for small businesses. We work with you as a partner. We work in English, Spanish and Russian and serve businesses across Miami and the surrounding area.',
+  es: 'HaloBits es un estudio de Miami que crea sitios web, automatización y software a la medida para negocios pequeños. Trabajamos contigo como socios. Trabajamos en inglés, español y ruso y atendemos negocios en Miami y sus alrededores.',
+  ru: 'HaloBits — студия в Майами, которая делает сайты, автоматизацию и программы на заказ для малого бизнеса. Работаем с вами как партнёр. Работаем на английском, испанском и русском и обслуживаем бизнес в Майами и окрестностях.',
 } as const;
 
 /** Online booking page (Cal.com, 15-minute intro call). Override per environment with
