@@ -35,7 +35,8 @@ export default defineConfig({
     sitemap({
       i18n: {
         defaultLocale: 'en',
-        locales: { en: 'en-US', es: 'es-US', ru: 'ru-US' },
+        // Must match the <link hreflang> codes in Base.astro (en / es / ru).
+        locales: { en: 'en', es: 'es', ru: 'ru' },
       },
     }),
   ],

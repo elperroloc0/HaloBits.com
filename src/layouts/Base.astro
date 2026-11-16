@@ -5,7 +5,8 @@
 import Nav, { type NavKey } from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Analytics from '@vercel/analytics/astro';
-import { getAlternateUrls, type Lang } from '../i18n/utils';
+import { getAlternateUrls, getBasePath, localizePath, useTranslations, type Lang } from '../i18n/utils';
+import { content } from '../i18n/content';
 import { SITE } from '../lib/site';
 import { IS_PREVIEW } from '../lib/env';
 import '../styles/global.css';
@@ -65,14 +66,17 @@ const ogLocales = { en: 'en_US', es: 'es_US', ru: 'ru_RU' };
 
 // Structured data: tells Google this is a Miami business, how to reach it and
 // which languages it works in (feeds the local-search knowledge panel).
+const orgId = `${SITE.url}/#organization`;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
+  '@id': orgId,
   name: SITE.name,
   url: SITE.url,
   logo: new URL('/favicon.svg', Astro.site).toString(),
   image: new URL('/og.jpg', Astro.site).toString(),
-  description: description,
+  // Same description on every page (the entity's, not the page's), per language.
+  description: content[lang].meta.home.description,
   telephone: SITE.phone,
   email: SITE.email,
   address: {
@@ -85,6 +89,44 @@ const jsonLd = {
   availableLanguage: ['English', 'Spanish', 'Russian'],
   // sameAs: add Google Business Profile / LinkedIn / Instagram URLs here once they exist.
 };
+
+// WebSite: names the site and its language for this URL version.
+const websiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${SITE.url}/#website`,
+  name: SITE.name,
+  url: new URL(localizePath('/', lang), Astro.site).toString(),
+  inLanguage: lang,
+  publisher: { '@id': orgId },
+};
+
+// BreadcrumbList for inner pages (Home → this page). Label = nav label when the
+// page is in the nav, else the part of the <title> before " — " (Privacy, Terms).
+const navT = useTranslations(lang).nav;
+const navLabels: Record<NavKey, string> = {
+  home: navT.home,
+  build: navT.whatWeBuild,
+  about: navT.about,
+  faq: navT.faq,
+  contact: navT.contact,
+};
+const isHome = getBasePath(Astro.url) === '/';
+const breadcrumbLd = isHome
+  ? null
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: navT.home, item: new URL(localizePath('/', lang), Astro.site).toString() },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: (current && navLabels[current]) || title.split(' — ')[0],
+          item: canonicalURL.toString(),
+        },
+      ],
+    };
 ---
 
 <!doctype html>
@@ -119,7 +161,7 @@ const jsonLd = {
     {hideFromSearch && <meta name="robots" content="noindex, nofollow" />}
     {gscToken && <meta name="google-site-verification" content={gscToken} />}
     {
-      [jsonLd, ...schema].map((obj) => (
+      [jsonLd, websiteLd, ...(breadcrumbLd && !noindex ? [breadcrumbLd] : []), ...schema].map((obj) => (
         <script type="application/ld+json" is:inline set:html={JSON.stringify(obj)} />
       ))
     }
