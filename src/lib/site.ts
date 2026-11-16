@@ -4,6 +4,8 @@
 // =============================================================================
 export const SITE = {
   name: 'HaloBits',
+  /** Registered company name (matches the footer, Privacy and Terms). */
+  legalName: 'HaloBits LLC',
   url: 'https://halobits.com',
   email: 'hello@halobits.com',
   /** E.164 format for tel: links */
